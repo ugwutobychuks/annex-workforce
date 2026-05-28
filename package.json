@@ -1,0 +1,27 @@
+{
+  "name": "annex-workforce",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": ["apps/*"],
+  "scripts": {
+    "dev": "concurrently -n api,web -c blue,green \"npm:dev:api\" \"npm:dev:web\"",
+    "dev:api": "npm --workspace=@annex/api run dev",
+    "dev:web": "npm --workspace=@annex/web run dev",
+    "build": "npm --workspaces run build",
+    "lint": "npm --workspaces run lint",
+    "test": "npm --workspaces run test",
+    "infra:up": "docker compose up -d",
+    "infra:down": "docker compose down",
+    "infra:logs": "docker compose logs -f",
+    "db:migrate": "npm --workspace=@annex/api run db:migrate",
+    "db:seed": "npm --workspace=@annex/api run db:seed",
+    "db:studio": "npm --workspace=@annex/api run db:studio",
+    "setup": "npm install && npm run infra:up && sleep 8 && npm run db:migrate && npm run db:seed"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "prettier": "^3.2.5",
+    "typescript": "^5.4.5"
+  },
+  "engines": { "node": ">=20.0.0" }
+}
