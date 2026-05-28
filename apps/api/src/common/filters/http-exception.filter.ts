@@ -1,13 +1,6 @@
-import {
-  ExceptionFilter,
-  Catch,
-  ArgumentsHost,
-  HttpException,
-  HttpStatus,
-  Logger,
-} from '@nestjs/common';
-import { Request, Response } from 'express';
-import { Prisma } from '@prisma/client';
+import { ExceptionFilter, Catch, ArgumentsHost, HttpStatus, Logger } from '@nestjs/common';
+import { Response } from 'express';
+import { PrismaClientKnownRequestError, PrismaClientValidationError } from '@prisma/client/runtime/library';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -19,50 +12,33 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
 
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
-    let message: string | string[] = 'Internal server error';
-    let error = 'Internal Server Error';
+    let message = 'Internal server error';
 
-    if (exception instanceof HttpException) {
-      status = exception.getStatus();
-      const res = exception.getResponse();
-      if (typeof res === 'string') {
-        message = res;
-      } else {
-        message = (res as any).message ?? message;
-        error = (res as any).error ?? exception.name;
-      }
-    } else if (exception instanceof Prisma.PrismaClientKnownRequestError) {
-      // P2002 = unique constraint, P2025 = not found
+    if (exception instanceof PrismaClientKnownRequestError) {
       if (exception.code === 'P2002') {
         status = HttpStatus.CONFLICT;
-        message = 'Resource already exists';
-        error = 'Conflict';
+        message = 'Unique constraint violation';
       } else if (exception.code === 'P2025') {
         status = HttpStatus.NOT_FOUND;
-        message = 'Resource not found';
-        error = 'Not Found';
+        message = 'Record not found';
       } else {
-        status = HttpStatus.BAD_REQUEST;
         message = `Database error: ${exception.code}`;
-        error = 'Bad Request';
       }
+    } else if (exception instanceof PrismaClientValidationError) {
+      status = HttpStatus.BAD_REQUEST;
+      message = 'Invalid data provided';
     } else if (exception instanceof Error) {
+      status = HttpStatus.BAD_REQUEST;
       message = exception.message;
     }
 
-    if (status >= 500) {
-      this.logger.error(
-        `${request.method} ${request.url} ${status}`,
-        exception instanceof Error ? exception.stack : String(exception),
-      );
-    }
+    this.logger.error(`${request.method} ${request.url} - ${status} - ${message}`);
 
     response.status(status).json({
       statusCode: status,
-      error,
-      message,
       timestamp: new Date().toISOString(),
       path: request.url,
+      message,
     });
   }
 }

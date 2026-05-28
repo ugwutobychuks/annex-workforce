@@ -108,7 +108,7 @@ export default function EmployerJobDetailPage() {
                     key={app.id}
                     app={app}
                     onClick={() => setSelectedAppId(app.id)}
-                    onMove={(newStatus) => updateStatus.mutate({ appId: app.id, status: newStatus })}
+                    onMove={(newStatus: string) => updateStatus.mutate({ appId: app.id, status: newStatus })}
                   />
                 ))}
                 {byStatus[stage.key].length === 0 && (
@@ -127,7 +127,7 @@ export default function EmployerJobDetailPage() {
         <ApplicantDetail
           applicationId={selectedAppId}
           onClose={() => setSelectedAppId(null)}
-          onStatusChange={(status, note) => {
+          onStatusChange={(status: string, note: string) => {
             updateStatus.mutate({ appId: selectedAppId, status, note });
           }}
         />

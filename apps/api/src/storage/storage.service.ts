@@ -21,27 +21,32 @@ export class StorageService {
   constructor(config: ConfigService) {
     this.bucket = config.get<string>('S3_BUCKET', 'annex-documents');
     this.endpoint = config.get<string>('S3_ENDPOINT', 'http://localhost:9000');
+    
+    const accessKey = config.get<string>('S3_ACCESS_KEY', 'annexminio');
+    const secretKey = config.get<string>('S3_SECRET_KEY', 'miniopassword');
+    
     this.s3 = new S3Client({
       endpoint: this.endpoint,
       region: config.get<string>('S3_REGION', 'us-east-1'),
       credentials: {
-        accessKeyId: config.get<string>('S3_ACCESS_KEY')!,
-        secretAccessKey: config.get<string>('S3_SECRET_KEY')!,
+        accessKeyId: accessKey,
+        secretAccessKey: secretKey,
       },
       forcePathStyle: config.get<string>('S3_FORCE_PATH_STYLE', 'true') === 'true',
     });
-    this.ensureBucket();
+    this.initializeBucket();
   }
 
-  private async ensureBucket() {
+  private async initializeBucket() {
     try {
       await this.s3.send(new HeadBucketCommand({ Bucket: this.bucket }));
+      this.logger.log(`✅ S3 bucket ready: ${this.bucket}`);
     } catch {
       try {
         await this.s3.send(new CreateBucketCommand({ Bucket: this.bucket }));
         this.logger.log(`📦 Bucket created: ${this.bucket}`);
-      } catch (e) {
-        this.logger.warn(`Could not auto-create bucket: ${(e as Error).message}`);
+      } catch (error) {
+        this.logger.debug(`S3 bucket auto-creation skipped (may already exist)`);
       }
     }
   }

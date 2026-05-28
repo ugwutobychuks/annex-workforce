@@ -235,7 +235,7 @@ export class JobsService {
         seniority: job.seniority,
         salaryMin: Number(job.salaryMin ?? 0),
         salaryMax: Number(job.salaryMax ?? 0),
-        skills: job.skills.map((s) => s.skill.name),
+        skills: job.skills.map((s: any) => s.skill.name),
         employerName: job.employer.name,
         publishedAt: job.publishedAt,
       });

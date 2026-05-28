@@ -1,182 +1,61 @@
-import { Injectable, NotFoundException, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import { InitiateVerificationDto } from './dto/verification.dto';
+import { InitiateVerificationDto } from './dto/initiate-verification.dto';
 
-/**
- * Verification Service
- *
- * Wraps third-party identity & credential providers (Smile Identity,
- * Youverify) behind a single interface. In production, the actual
- * provider calls happen inside async jobs; this service handles the
- * record-keeping + result interpretation.
- */
 @Injectable()
 export class VerificationService {
-  private readonly logger = new Logger(VerificationService.name);
+  constructor(private prisma: PrismaService) {}
 
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly config: ConfigService,
-  ) {}
-
-  async initiate(userId: string, dto: InitiateVerificationDto) {
-    const candidate = await this.prisma.candidate.findUnique({ where: { userId } });
-    if (!candidate) throw new NotFoundException('Candidate profile not found');
-
-    const record = await this.prisma.verificationRecord.create({
+  async initiate(candidateId: string, dto: InitiateVerificationDto) {
+    return this.prisma.verificationRecord.create({
       data: {
-        candidateId: candidate.id,
+        candidateId,
         type: dto.type,
-        provider: dto.provider ?? this.defaultProvider(dto.type),
+        provider: dto.provider || 'manual',
         status: 'PENDING',
-        result: dto.metadata ?? {},
+        result: (dto.metadata ?? {}) as Prisma.InputJsonObject,
       },
     });
-
-    // Fire & forget — in production, push to a BullMQ queue
-    this.runVerification(record.id).catch((e) =>
-      this.logger.error(`Verification failed: ${(e as Error).message}`),
-    );
-
-    return record;
   }
 
-  async listForCandidate(userId: string) {
-    const candidate = await this.prisma.candidate.findUnique({ where: { userId } });
-    if (!candidate) return [];
+  async listForCandidate(candidateId: string) {
     return this.prisma.verificationRecord.findMany({
-      where: { candidateId: candidate.id },
+      where: { candidateId },
       orderBy: { initiatedAt: 'desc' },
     });
   }
 
-  async adminList(filters: { status?: string; page: number; limit: number }) {
-    const where: any = filters.status ? { status: filters.status } : {};
-    const [items, total] = await Promise.all([
-      this.prisma.verificationRecord.findMany({
-        where,
-        skip: (filters.page - 1) * filters.limit,
-        take: filters.limit,
-        orderBy: { initiatedAt: 'desc' },
-        include: {
-          candidate: {
-            include: { user: { select: { firstName: true, lastName: true, email: true } } },
-          },
-        },
-      }),
-      this.prisma.verificationRecord.count({ where }),
-    ]);
-    return { items, total, page: filters.page, limit: filters.limit };
+  async adminList(filters?: any) {
+    return this.prisma.verificationRecord.findMany({
+      include: { candidate: true },
+      orderBy: { initiatedAt: 'desc' },
+    });
   }
 
-  async manualApprove(verificationId: string, approverId: string) {
-    const record = await this.prisma.verificationRecord.update({
-      where: { id: verificationId },
+  async manualApprove(id: string, adminId: string) {
+    const record = await this.prisma.verificationRecord.findUnique({ where: { id } });
+    if (!record) throw new NotFoundException('Verification record not found');
+    return this.prisma.verificationRecord.update({
+      where: { id },
       data: {
         status: 'VERIFIED',
         completedAt: new Date(),
-        result: { approvedBy: approverId, manual: true },
+        result: { ...(record.result as object), manuallyApproved: true, approvedBy: adminId },
       },
-      include: { candidate: true },
     });
-    await this.bumpVerificationLevel(record.candidateId);
-    return record;
   }
 
-  async manualReject(verificationId: string, approverId: string, reason: string) {
+  async manualReject(id: string, adminId: string, reason?: string) {
+    const record = await this.prisma.verificationRecord.findUnique({ where: { id } });
+    if (!record) throw new NotFoundException('Verification record not found');
     return this.prisma.verificationRecord.update({
-      where: { id: verificationId },
+      where: { id },
       data: {
         status: 'FAILED',
         completedAt: new Date(),
-        result: { rejectedBy: approverId, reason },
+        result: { ...(record.result as object), rejectionReason: reason || 'Manual rejection', rejectedBy: adminId },
       },
     });
-  }
-
-  // ─── Internal: provider integration stubs ────────────────────
-
-  private async runVerification(recordId: string) {
-    const record = await this.prisma.verificationRecord.findUnique({ where: { id: recordId } });
-    if (!record) return;
-
-    let success = false;
-    let providerResult: Record<string, unknown> = {};
-
-    try {
-      // In production: call Smile Identity / Youverify here.
-      // For MVP we simulate a successful identity verification.
-      if (record.provider === 'smile_identity') {
-        providerResult = await this.callSmileIdentity(record);
-        success = true;
-      } else if (record.provider === 'youverify') {
-        providerResult = await this.callYouverify(record);
-        success = true;
-      } else {
-        // Manual-only — leave as PENDING for an admin to handle
-        return;
-      }
-    } catch (e) {
-      providerResult = { error: (e as Error).message };
-    }
-
-    await this.prisma.verificationRecord.update({
-      where: { id: recordId },
-      data: {
-        status: success ? 'VERIFIED' : 'FAILED',
-        completedAt: new Date(),
-        result: providerResult as any,
-      },
-    });
-
-    if (success) await this.bumpVerificationLevel(record.candidateId);
-  }
-
-  private async callSmileIdentity(record: { type: string }): Promise<Record<string, unknown>> {
-    const apiKey = this.config.get<string>('SMILE_IDENTITY_API_KEY');
-    if (!apiKey) {
-      this.logger.warn('SMILE_IDENTITY_API_KEY missing — returning stub success');
-      return { simulated: true, type: record.type };
-    }
-    // TODO: integrate Smile Identity SDK.
-    // https://docs.smileidentity.com/products/biometric-kyc
-    return { simulated: true };
-  }
-
-  private async callYouverify(record: { type: string }): Promise<Record<string, unknown>> {
-    const apiKey = this.config.get<string>('YOUVERIFY_API_KEY');
-    if (!apiKey) {
-      this.logger.warn('YOUVERIFY_API_KEY missing — returning stub success');
-      return { simulated: true, type: record.type };
-    }
-    // TODO: call https://api.youverify.co/v2/api/...
-    return { simulated: true };
-  }
-
-  private async bumpVerificationLevel(candidateId: string) {
-    const records = await this.prisma.verificationRecord.findMany({
-      where: { candidateId, status: 'VERIFIED' },
-    });
-    const types = new Set(records.map((r) => r.type));
-
-    let level: 'EMAIL_VERIFIED' | 'IDENTITY_VERIFIED' | 'CREDENTIALS_VERIFIED' | 'FULLY_VERIFIED' =
-      'EMAIL_VERIFIED';
-    if (types.has('IDENTITY')) level = 'IDENTITY_VERIFIED';
-    if (types.has('IDENTITY') && types.has('EDUCATION')) level = 'CREDENTIALS_VERIFIED';
-    if (types.has('IDENTITY') && types.has('EDUCATION') && types.has('EMPLOYMENT')) {
-      level = 'FULLY_VERIFIED';
-    }
-
-    await this.prisma.candidate.update({
-      where: { id: candidateId },
-      data: { verificationLevel: level as any },
-    });
-  }
-
-  private defaultProvider(type: string): string {
-    if (type === 'IDENTITY') return 'smile_identity';
-    if (type === 'EMPLOYMENT' || type === 'BACKGROUND') return 'youverify';
-    return 'manual';
   }
 }
