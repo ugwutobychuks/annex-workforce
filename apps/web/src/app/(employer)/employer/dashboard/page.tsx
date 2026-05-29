@@ -45,7 +45,7 @@ export default function EmployerDashboard() {
 
   if (loadingEmployer || employer === null) {
     return (
-      <div className="flex items-center gap-2 text-stone-500">
+      <div className="flex items-center gap-2 text-slate-500">
         <Loader2 className="w-4 h-4 animate-spin" /> Loading…
       </div>
     );
@@ -59,7 +59,7 @@ export default function EmployerDashboard() {
     <div className="space-y-10">
       <header className="flex items-start justify-between gap-4">
         <div>
-          <div className="text-xs uppercase tracking-[0.18em] text-stone-500 mb-2">{employer.name}</div>
+          <div className="text-xs uppercase tracking-[0.18em] text-slate-500 mb-2">{employer.name}</div>
           <h1 className="font-display text-4xl">Hello, {user?.firstName}.</h1>
         </div>
         <Link href="/employer/jobs" className="btn-primary">
@@ -77,31 +77,31 @@ export default function EmployerDashboard() {
       <section>
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-display text-2xl">Recent jobs</h2>
-          <Link href="/employer/jobs" className="text-sm text-forest-700 hover:underline flex items-center gap-1">
+          <Link href="/employer/jobs" className="text-sm text-brand-700 hover:underline flex items-center gap-1">
             All jobs <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
         <div className="grid gap-3">
           {jobs?.length === 0 && (
-            <div className="card text-center py-12 text-stone-500">
-              <Briefcase className="w-10 h-10 mx-auto mb-3 text-stone-300" />
+            <div className="card text-center py-12 text-slate-500">
+              <Briefcase className="w-10 h-10 mx-auto mb-3 text-slate-300" />
               No jobs posted yet.
             </div>
           )}
           {jobs?.slice(0, 5).map((j) => (
-            <Link key={j.id} href={`/employer/jobs/${j.id}`} className="card hover:border-forest-300 transition-colors">
+            <Link key={j.id} href={`/employer/jobs/${j.id}`} className="card hover:border-brand-300 transition-colors">
               <div className="flex justify-between gap-4">
                 <div>
                   <div className="font-medium">{j.title}</div>
-                  <div className="text-sm text-stone-600 mt-0.5 capitalize">
+                  <div className="text-sm text-slate-600 mt-0.5 capitalize">
                     {j.workArrangement?.toLowerCase()} · {j.location ?? j.country}
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className={`chip ${j.status === 'PUBLISHED' ? 'bg-emerald-50 text-emerald-800' : 'bg-stone-100 text-stone-600'}`}>
+                  <span className={`chip ${j.status === 'PUBLISHED' ? 'bg-emerald-50 text-emerald-800' : 'bg-slate-100 text-slate-600'}`}>
                     {j.status.toLowerCase()}
                   </span>
-                  <div className="text-xs text-stone-500 mt-2">{j._count?.applications ?? 0} applicants</div>
+                  <div className="text-xs text-slate-500 mt-2">{j._count?.applications ?? 0} applicants</div>
                 </div>
               </div>
             </Link>
@@ -116,8 +116,8 @@ function Stat({ label, value, icon: Icon }: any) {
   return (
     <div className="card">
       <div className="flex items-center justify-between">
-        <span className="text-xs uppercase tracking-wider text-stone-500">{label}</span>
-        <Icon className="w-4 h-4 text-stone-400" />
+        <span className="text-xs uppercase tracking-wider text-slate-500">{label}</span>
+        <Icon className="w-4 h-4 text-slate-400" />
       </div>
       <div className="font-display text-3xl mt-2">{value}</div>
     </div>

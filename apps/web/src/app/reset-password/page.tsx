@@ -42,12 +42,12 @@ function ResetPasswordInner() {
         {done ? (
           <>
             <h1 className="font-display text-2xl mb-2">Password updated</h1>
-            <p className="text-stone-600">Redirecting to sign in…</p>
+            <p className="text-slate-600">Redirecting to sign in…</p>
           </>
         ) : (
           <>
             <h1 className="font-display text-2xl mb-2">Set a new password</h1>
-            <p className="text-stone-600 mb-6">Pick a strong one this time.</p>
+            <p className="text-slate-600 mb-6">Pick a strong one this time.</p>
             <form onSubmit={onSubmit} className="space-y-4">
               <div>
                 <label className="label">New password</label>
@@ -65,7 +65,7 @@ function ResetPasswordInner() {
                 Update password
               </button>
             </form>
-            <Link href="/login" className="mt-6 inline-block text-sm text-forest-700 hover:underline">
+            <Link href="/login" className="mt-6 inline-block text-sm text-brand-700 hover:underline">
               ← Back to sign in
             </Link>
           </>

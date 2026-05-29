@@ -32,19 +32,19 @@ export default function TalentDashboard() {
   return (
     <div className="space-y-10">
       <header>
-        <div className="text-xs uppercase tracking-[0.18em] text-stone-500 mb-2">Your dashboard</div>
+        <div className="text-xs uppercase tracking-[0.18em] text-slate-500 mb-2">Your dashboard</div>
         <h1 className="font-display text-4xl">Hello, {user?.firstName}.</h1>
-        <p className="text-stone-600 mt-2">Here's what's happening with your work search.</p>
+        <p className="text-slate-600 mt-2">Here's what's happening with your work search.</p>
       </header>
 
       {/* Profile completion + verification banner */}
       {(profileCompleteness < 80 || profile?.verificationLevel === 'UNVERIFIED' || profile?.verificationLevel === 'EMAIL_VERIFIED') && (
-        <div className="card border-l-4 border-l-ember-500">
+        <div className="card border-l-4 border-l-accent-500">
           <div className="flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-ember-600 mt-0.5 shrink-0" />
+            <AlertCircle className="w-5 h-5 text-accent-600 mt-0.5 shrink-0" />
             <div className="flex-1">
               <div className="font-medium">Increase your visibility to employers.</div>
-              <p className="text-sm text-stone-600 mt-1">
+              <p className="text-sm text-slate-600 mt-1">
                 Profiles with verified identity and 80%+ completion appear in 4× more searches.
               </p>
               <div className="mt-3 flex flex-wrap gap-2">
@@ -53,13 +53,13 @@ export default function TalentDashboard() {
               </div>
             </div>
           </div>
-          <div className="mt-4 h-1.5 bg-stone-100 rounded-full overflow-hidden">
+          <div className="mt-4 h-1.5 bg-slate-100 rounded-full overflow-hidden">
             <div
-              className="h-full bg-forest-700 transition-all duration-500"
+              className="h-full bg-brand-700 transition-all duration-500"
               style={{ width: `${profileCompleteness}%` }}
             />
           </div>
-          <div className="text-xs text-stone-500 mt-1.5">{profileCompleteness}% complete</div>
+          <div className="text-xs text-slate-500 mt-1.5">{profileCompleteness}% complete</div>
         </div>
       )}
 
@@ -82,10 +82,10 @@ export default function TalentDashboard() {
       <section>
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-display text-2xl flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-ember-500" />
+            <Sparkles className="w-5 h-5 text-accent-500" />
             Jobs that match your profile
           </h2>
-          <Link href="/jobs" className="text-sm text-forest-700 hover:underline flex items-center gap-1">
+          <Link href="/jobs" className="text-sm text-brand-700 hover:underline flex items-center gap-1">
             All jobs <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
@@ -95,12 +95,12 @@ export default function TalentDashboard() {
               <Link
                 key={job.id}
                 href={`/jobs/${job.id}`}
-                className="card hover:border-forest-300 transition-colors group"
+                className="card hover:border-brand-300 transition-colors group"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <div className="font-medium group-hover:text-forest-700 transition-colors">{job.title}</div>
-                    <div className="text-sm text-stone-600 mt-0.5">
+                    <div className="font-medium group-hover:text-brand-700 transition-colors">{job.title}</div>
+                    <div className="text-sm text-slate-600 mt-0.5">
                       {job.employer?.name ?? job.employerName} · {job.location ?? job.country} ·{' '}
                       <span className="capitalize">{(job.workArrangement ?? '').toLowerCase()}</span>
                     </div>
@@ -116,7 +116,7 @@ export default function TalentDashboard() {
                         ? `${formatNaira(job.salaryMin)} – ${formatNaira(job.salaryMax)}`
                         : '—'}
                     </div>
-                    <div className="text-xs text-stone-500 mt-1 capitalize">
+                    <div className="text-xs text-slate-500 mt-1 capitalize">
                       {(job.seniority ?? '').toLowerCase()}
                     </div>
                   </div>
@@ -124,8 +124,8 @@ export default function TalentDashboard() {
               </Link>
             ))
           ) : (
-            <div className="card text-center text-stone-500 py-12">
-              <Briefcase className="w-8 h-8 mx-auto mb-2 text-stone-300" />
+            <div className="card text-center text-slate-500 py-12">
+              <Briefcase className="w-8 h-8 mx-auto mb-2 text-slate-300" />
               No matching jobs yet.
             </div>
           )}
@@ -138,12 +138,12 @@ export default function TalentDashboard() {
 function StatCard({ label, value, hint, icon: Icon }: any) {
   return (
     <div className="card">
-      <div className="text-xs uppercase tracking-wider text-stone-500 mb-2 flex items-center gap-1.5">
+      <div className="text-xs uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-1.5">
         {Icon && <Icon className="w-3 h-3" />}
         {label}
       </div>
       <div className="font-display text-2xl capitalize">{value}</div>
-      {hint && <div className="text-xs text-stone-400 mt-1">{hint}</div>}
+      {hint && <div className="text-xs text-slate-400 mt-1">{hint}</div>}
     </div>
   );
 }

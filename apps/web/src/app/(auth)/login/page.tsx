@@ -41,7 +41,7 @@ export default function LoginPage() {
   return (
     <>
       <h1 className="font-display text-4xl mb-2">Welcome back.</h1>
-      <p className="text-stone-600 mb-8">Sign in to continue your work.</p>
+      <p className="text-slate-600 mb-8">Sign in to continue your work.</p>
 
       <form onSubmit={onSubmit} className="space-y-5">
         <div>
@@ -51,7 +51,7 @@ export default function LoginPage() {
         <div>
           <div className="flex items-center justify-between mb-1.5">
             <label className="label !mb-0" htmlFor="password">Password</label>
-            <Link href="/forgot-password" className="text-xs text-forest-700 hover:underline">Forgot?</Link>
+            <Link href="/forgot-password" className="text-xs text-brand-700 hover:underline">Forgot?</Link>
           </div>
           <input id="password" name="password" type="password" required autoComplete="current-password" className="input" placeholder="••••••••" />
         </div>
@@ -66,11 +66,11 @@ export default function LoginPage() {
         </button>
       </form>
 
-      <p className="mt-8 text-sm text-stone-600">
-        New to Annex? <Link href="/register" className="text-forest-700 font-medium hover:underline">Create an account</Link>
+      <p className="mt-8 text-sm text-slate-600">
+        New to Annex? <Link href="/register" className="text-brand-700 font-medium hover:underline">Create an account</Link>
       </p>
 
-      <div className="mt-10 pt-6 border-t border-stone-200 text-xs text-stone-500">
+      <div className="mt-10 pt-6 border-t border-slate-200 text-xs text-slate-500">
         <p className="mb-1">Try the demo:</p>
         <p className="font-mono">candidate@example.com · Pass@1234</p>
         <p className="font-mono">employer@techstartup.io · Pass@1234</p>

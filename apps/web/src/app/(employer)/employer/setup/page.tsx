@@ -39,10 +39,10 @@ export default function EmployerSetupPage() {
   return (
     <div className="space-y-6 max-w-3xl">
       <header>
-        <Building2 className="w-10 h-10 text-forest-700 mb-3" />
-        <div className="text-xs uppercase tracking-[0.18em] text-stone-500 mb-2">Welcome</div>
+        <Building2 className="w-10 h-10 text-brand-700 mb-3" />
+        <div className="text-xs uppercase tracking-[0.18em] text-slate-500 mb-2">Welcome</div>
         <h1 className="font-display text-4xl">Set up your company.</h1>
-        <p className="text-stone-600 mt-2">
+        <p className="text-slate-600 mt-2">
           Tell us about your organization. You can edit these details any time.
         </p>
       </header>
@@ -110,7 +110,7 @@ export default function EmployerSetupPage() {
           />
         </div>
 
-        <div className="flex justify-end gap-3 pt-3 border-t border-stone-200">
+        <div className="flex justify-end gap-3 pt-3 border-t border-slate-200">
           <button type="submit" disabled={create.isPending} className="btn-primary">
             {create.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
             Create company

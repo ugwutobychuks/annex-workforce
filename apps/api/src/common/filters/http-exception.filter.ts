@@ -7,7 +7,25 @@ import {
   Logger,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { Prisma } from '@prisma/client';
+
+/**
+ * Type guard for Prisma's known request error.
+ *
+ * We avoid `instanceof Prisma.PrismaClientKnownRequestError` because the
+ * runtime class lives at `@prisma/client/runtime/library` (a path that
+ * changes across Prisma versions). Duck-typing is more resilient.
+ */
+function isPrismaKnownError(
+  e: unknown,
+): e is { code: string; meta?: Record<string, unknown>; message: string } {
+  return (
+    typeof e === 'object' &&
+    e !== null &&
+    'name' in e &&
+    (e as { name: string }).name === 'PrismaClientKnownRequestError' &&
+    'code' in e
+  );
+}
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -18,7 +36,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
 
-    let status = HttpStatus.INTERNAL_SERVER_ERROR;
+    let status: number = HttpStatus.INTERNAL_SERVER_ERROR;
     let message: string | string[] = 'Internal server error';
     let error = 'Internal Server Error';
 
@@ -28,10 +46,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
       if (typeof res === 'string') {
         message = res;
       } else {
-        message = (res as any).message ?? message;
-        error = (res as any).error ?? exception.name;
+        message = (res as { message?: string | string[] }).message ?? message;
+        error = (res as { error?: string }).error ?? exception.name;
       }
-    } else if (exception instanceof Prisma.PrismaClientKnownRequestError) {
+    } else if (isPrismaKnownError(exception)) {
       // P2002 = unique constraint, P2025 = not found
       if (exception.code === 'P2002') {
         status = HttpStatus.CONFLICT;

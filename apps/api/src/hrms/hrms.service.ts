@@ -152,7 +152,7 @@ export class HrmsService {
     // Synthesize defaults for any missing leave types
     const types = Object.keys(DEFAULT_ENTITLEMENTS);
     return types.map((type) => {
-      const existing = balances.find((b) => b.type === type);
+      const existing = balances.find((b: any) => b.type === type);
       return {
         type,
         year,

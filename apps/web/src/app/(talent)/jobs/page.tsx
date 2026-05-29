@@ -29,15 +29,15 @@ export default function JobsPage() {
   return (
     <div className="space-y-8">
       <header>
-        <div className="text-xs uppercase tracking-[0.18em] text-stone-500 mb-2">Jobs</div>
+        <div className="text-xs uppercase tracking-[0.18em] text-slate-500 mb-2">Jobs</div>
         <h1 className="font-display text-4xl">Find your next role.</h1>
-        <p className="text-stone-600 mt-2">Search verified opportunities across Africa and remote.</p>
+        <p className="text-slate-600 mt-2">Search verified opportunities across Africa and remote.</p>
       </header>
 
       {/* Filters */}
       <div className="card grid md:grid-cols-4 gap-3">
         <div className="md:col-span-2 relative">
-          <Search className="w-4 h-4 absolute left-3 top-3.5 text-stone-400" />
+          <Search className="w-4 h-4 absolute left-3 top-3.5 text-slate-400" />
           <input
             value={filters.q}
             onChange={(e) => { setFilters({ ...filters, q: e.target.value }); setPage(1); }}
@@ -70,26 +70,26 @@ export default function JobsPage() {
 
       {/* Results */}
       {isLoading ? (
-        <div className="text-stone-500">Searching…</div>
+        <div className="text-slate-500">Searching…</div>
       ) : data?.hits?.length === 0 ? (
-        <div className="card text-center py-16 text-stone-500">
-          <Briefcase className="w-10 h-10 mx-auto mb-3 text-stone-300" />
+        <div className="card text-center py-16 text-slate-500">
+          <Briefcase className="w-10 h-10 mx-auto mb-3 text-slate-300" />
           No jobs match those filters.
         </div>
       ) : (
         <>
-          <div className="text-sm text-stone-500">{data?.total} jobs</div>
+          <div className="text-sm text-slate-500">{data?.total} jobs</div>
           <div className="grid gap-3">
             {data?.hits?.map((job: any) => (
               <Link
                 key={job.id}
                 href={`/jobs/${job.id}`}
-                className="card hover:border-forest-300 transition-colors group block"
+                className="card hover:border-brand-300 transition-colors group block"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-display text-xl group-hover:text-forest-700 transition-colors">{job.title}</h3>
-                    <div className="text-sm text-stone-600 mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
+                    <h3 className="font-display text-xl group-hover:text-brand-700 transition-colors">{job.title}</h3>
+                    <div className="text-sm text-slate-600 mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
                       <span>{job.employer?.name ?? job.employerName}</span>
                       <span>·</span>
                       <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> {job.location ?? job.country}</span>
@@ -111,7 +111,7 @@ export default function JobsPage() {
                         : '—'}
                     </div>
                     {job.publishedAt && (
-                      <div className="text-xs text-stone-500 mt-1">{relativeTime(job.publishedAt)}</div>
+                      <div className="text-xs text-slate-500 mt-1">{relativeTime(job.publishedAt)}</div>
                     )}
                   </div>
                 </div>

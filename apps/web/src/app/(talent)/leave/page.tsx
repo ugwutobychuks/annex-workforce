@@ -18,10 +18,10 @@ const LEAVE_TYPES = [
 ];
 
 const STATUS_STYLES: Record<string, string> = {
-  PENDING: 'bg-sand-100 text-sand-700',
+  PENDING: 'bg-amber-100 text-amber-700',
   APPROVED: 'bg-emerald-50 text-emerald-800',
   REJECTED: 'bg-red-50 text-red-700',
-  CANCELLED: 'bg-stone-100 text-stone-500',
+  CANCELLED: 'bg-slate-100 text-slate-500',
 };
 
 export default function LeavePage() {
@@ -75,7 +75,7 @@ export default function LeavePage() {
     <div className="space-y-8">
       <header className="flex items-start justify-between gap-4">
         <div>
-          <div className="text-xs uppercase tracking-[0.18em] text-stone-500 mb-2">Time off</div>
+          <div className="text-xs uppercase tracking-[0.18em] text-slate-500 mb-2">Time off</div>
           <h1 className="font-display text-4xl">Manage your leave.</h1>
         </div>
         <button onClick={() => setShowRequest(true)} className="btn-primary shrink-0">
@@ -89,16 +89,16 @@ export default function LeavePage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {balances?.filter((b) => b.entitled > 0).map((b: any) => (
             <div key={b.type} className="card">
-              <div className="text-xs uppercase tracking-wider text-stone-500">
+              <div className="text-xs uppercase tracking-wider text-slate-500">
                 {LEAVE_TYPES.find((t) => t.key === b.type)?.label ?? b.type}
               </div>
               <div className="mt-2">
                 <span className="font-display text-2xl">{b.remaining}</span>
-                <span className="text-stone-400 text-sm">/{b.entitled} days</span>
+                <span className="text-slate-400 text-sm">/{b.entitled} days</span>
               </div>
-              <div className="mt-2 h-1 bg-stone-100 rounded-full overflow-hidden">
+              <div className="mt-2 h-1 bg-slate-100 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-forest-700"
+                  className="h-full bg-brand-700"
                   style={{ width: `${(b.used / Math.max(b.entitled, 1)) * 100}%` }}
                 />
               </div>
@@ -112,8 +112,8 @@ export default function LeavePage() {
         <h2 className="font-display text-xl mb-3">My requests</h2>
         {!requests || requests.length === 0 ? (
           <div className="card text-center py-12">
-            <Calendar className="w-10 h-10 mx-auto mb-3 text-stone-300" />
-            <p className="text-stone-500 text-sm">No leave requests yet.</p>
+            <Calendar className="w-10 h-10 mx-auto mb-3 text-slate-300" />
+            <p className="text-slate-500 text-sm">No leave requests yet.</p>
           </div>
         ) : (
           <div className="grid gap-3">
@@ -125,17 +125,17 @@ export default function LeavePage() {
                       <span className="font-medium">
                         {LEAVE_TYPES.find((t) => t.key === r.type)?.label ?? r.type}
                       </span>
-                      <span className="text-xs text-stone-500 font-mono">{r.daysRequested} days</span>
+                      <span className="text-xs text-slate-500 font-mono">{r.daysRequested} days</span>
                     </div>
-                    <div className="text-sm text-stone-600">
+                    <div className="text-sm text-slate-600">
                       {formatDate(r.startDate)} → {formatDate(r.endDate)}
                     </div>
                     {r.reason && (
-                      <p className="text-sm text-stone-500 mt-2 italic">"{r.reason}"</p>
+                      <p className="text-sm text-slate-500 mt-2 italic">"{r.reason}"</p>
                     )}
                     {r.approverNote && (
-                      <p className="text-sm bg-stone-50 rounded-md p-2 mt-2">
-                        <span className="text-xs text-stone-500">Manager note:</span> {r.approverNote}
+                      <p className="text-sm bg-slate-50 rounded-md p-2 mt-2">
+                        <span className="text-xs text-slate-500">Manager note:</span> {r.approverNote}
                       </p>
                     )}
                   </div>
@@ -146,7 +146,7 @@ export default function LeavePage() {
                     {(r.status === 'PENDING' || r.status === 'APPROVED') && (
                       <button
                         onClick={() => cancel.mutate(r.id)}
-                        className="block ml-auto text-xs text-stone-500 hover:text-red-700"
+                        className="block ml-auto text-xs text-slate-500 hover:text-red-700"
                       >
                         Cancel
                       </button>
@@ -163,7 +163,7 @@ export default function LeavePage() {
       {showRequest && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg w-full max-w-md">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
               <h2 className="font-display text-2xl">Request time off</h2>
               <button onClick={() => setShowRequest(false)}><X className="w-5 h-5" /></button>
             </div>

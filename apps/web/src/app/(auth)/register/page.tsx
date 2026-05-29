@@ -44,10 +44,10 @@ function RegisterForm() {
   return (
     <>
       <h1 className="font-display text-4xl mb-2">Create your account.</h1>
-      <p className="text-stone-600 mb-8">Choose your path to get started.</p>
+      <p className="text-slate-600 mb-8">Choose your path to get started.</p>
 
       {/* Role toggle */}
-      <div className="grid grid-cols-2 gap-2 mb-6 p-1 bg-stone-100 rounded-lg">
+      <div className="grid grid-cols-2 gap-2 mb-6 p-1 bg-slate-100 rounded-lg">
         {(['CANDIDATE', 'EMPLOYER'] as const).map((r) => (
           <button
             key={r}
@@ -55,8 +55,8 @@ function RegisterForm() {
             onClick={() => setRole(r)}
             className={
               role === r
-                ? 'rounded-md py-2 px-3 text-sm font-medium bg-white text-forest-900 shadow-sm'
-                : 'rounded-md py-2 px-3 text-sm font-medium text-stone-600 hover:text-forest-800'
+                ? 'rounded-md py-2 px-3 text-sm font-medium bg-white text-brand-900 shadow-sm'
+                : 'rounded-md py-2 px-3 text-sm font-medium text-slate-600 hover:text-brand-800'
             }
           >
             {r === 'CANDIDATE' ? "I'm looking for work" : 'I want to hire'}
@@ -86,7 +86,7 @@ function RegisterForm() {
         <div>
           <label className="label" htmlFor="password">Password</label>
           <input id="password" name="password" type="password" required minLength={8} className="input" />
-          <p className="text-xs text-stone-500 mt-1">8+ characters with upper, lower, and a digit.</p>
+          <p className="text-xs text-slate-500 mt-1">8+ characters with upper, lower, and a digit.</p>
         </div>
 
         {error && (
@@ -99,8 +99,8 @@ function RegisterForm() {
         </button>
       </form>
 
-      <p className="mt-8 text-sm text-stone-600">
-        Already have an account? <Link href="/login" className="text-forest-700 font-medium hover:underline">Sign in</Link>
+      <p className="mt-8 text-sm text-slate-600">
+        Already have an account? <Link href="/login" className="text-brand-700 font-medium hover:underline">Sign in</Link>
       </p>
     </>
   );

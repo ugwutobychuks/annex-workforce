@@ -86,7 +86,7 @@ export default function ProfilePage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center gap-2 text-stone-500">
+      <div className="flex items-center gap-2 text-slate-500">
         <Loader2 className="w-4 h-4 animate-spin" /> Loading…
       </div>
     );
@@ -114,7 +114,7 @@ export default function ProfilePage() {
   return (
     <div className="space-y-8">
       <header>
-        <div className="text-xs uppercase tracking-[0.18em] text-stone-500 mb-2">Your profile</div>
+        <div className="text-xs uppercase tracking-[0.18em] text-slate-500 mb-2">Your profile</div>
         <h1 className="font-display text-4xl">Tell employers who you are.</h1>
       </header>
 
@@ -209,7 +209,7 @@ export default function ProfilePage() {
         </h2>
         {profile?.resumeUrl ? (
           <div className="flex items-center gap-3">
-            <a href={profile.resumeUrl} target="_blank" rel="noopener" className="text-forest-700 hover:underline text-sm">
+            <a href={profile.resumeUrl} target="_blank" rel="noopener" className="text-brand-700 hover:underline text-sm">
               View current resume
             </a>
             <button
@@ -247,7 +247,7 @@ export default function ProfilePage() {
       <div className="card">
         <h2 className="font-display text-xl mb-4">Skills</h2>
         <div className="flex flex-wrap gap-2 mb-4 min-h-[28px]">
-          {profile?.skills?.length === 0 && <span className="text-sm text-stone-400">No skills added yet.</span>}
+          {profile?.skills?.length === 0 && <span className="text-sm text-slate-400">No skills added yet.</span>}
           {profile?.skills?.map((s: any) => (
             <span key={s.id} className="chip flex items-center gap-1.5">
               {s.skill.name}
@@ -304,7 +304,7 @@ export default function ProfilePage() {
               (e.currentTarget as HTMLFormElement).reset();
               setShowExp(false);
             }}
-            className="bg-stone-50 rounded-md p-4 mb-4 space-y-3"
+            className="bg-slate-50 rounded-md p-4 mb-4 space-y-3"
           >
             <div className="grid grid-cols-2 gap-3">
               <input name="title" required placeholder="Job title" className="input" />
@@ -330,16 +330,16 @@ export default function ProfilePage() {
 
         <div className="space-y-4">
           {profile?.experiences?.length === 0 && (
-            <p className="text-sm text-stone-400">No experience added yet.</p>
+            <p className="text-sm text-slate-400">No experience added yet.</p>
           )}
           {profile?.experiences?.map((e: any) => (
-            <div key={e.id} className="border-l-2 border-forest-200 pl-4">
+            <div key={e.id} className="border-l-2 border-brand-200 pl-4">
               <div className="font-medium">{e.title}</div>
-              <div className="text-sm text-stone-600">{e.company}{e.location ? ` · ${e.location}` : ''}</div>
-              <div className="text-xs text-stone-500 mt-1">
+              <div className="text-sm text-slate-600">{e.company}{e.location ? ` · ${e.location}` : ''}</div>
+              <div className="text-xs text-slate-500 mt-1">
                 {formatDate(e.startDate)} – {e.isCurrent ? 'Present' : (e.endDate ? formatDate(e.endDate) : '—')}
               </div>
-              {e.description && <p className="text-sm text-stone-700 mt-2">{e.description}</p>}
+              {e.description && <p className="text-sm text-slate-700 mt-2">{e.description}</p>}
             </div>
           ))}
         </div>
@@ -372,7 +372,7 @@ export default function ProfilePage() {
               (e.currentTarget as HTMLFormElement).reset();
               setShowEdu(false);
             }}
-            className="bg-stone-50 rounded-md p-4 mb-4 space-y-3"
+            className="bg-slate-50 rounded-md p-4 mb-4 space-y-3"
           >
             <div className="grid grid-cols-2 gap-3">
               <input name="institution" required placeholder="University / school" className="input" />
@@ -394,16 +394,16 @@ export default function ProfilePage() {
 
         <div className="space-y-4">
           {profile?.educations?.length === 0 && (
-            <p className="text-sm text-stone-400">No education added yet.</p>
+            <p className="text-sm text-slate-400">No education added yet.</p>
           )}
           {profile?.educations?.map((e: any) => (
-            <div key={e.id} className="border-l-2 border-forest-200 pl-4">
+            <div key={e.id} className="border-l-2 border-brand-200 pl-4">
               <div className="font-medium">{e.institution}</div>
-              <div className="text-sm text-stone-600">
+              <div className="text-sm text-slate-600">
                 {e.degree}{e.fieldOfStudy ? `, ${e.fieldOfStudy}` : ''}
                 {e.grade ? ` · ${e.grade}` : ''}
               </div>
-              <div className="text-xs text-stone-500 mt-1">
+              <div className="text-xs text-slate-500 mt-1">
                 {e.startYear} – {e.endYear ?? 'Present'}
               </div>
             </div>

@@ -17,7 +17,7 @@ export function LiveIndicator({ updatedAt }: { updatedAt?: number }) {
   }, [updatedAt]);
 
   return (
-    <span className="inline-flex items-center gap-1.5 text-xs text-stone-500">
+    <span className="inline-flex items-center gap-1.5 text-xs text-slate-500">
       <span
         className={`inline-block w-1.5 h-1.5 rounded-full ${
           pulsing ? 'bg-emerald-500' : 'bg-emerald-400/70'

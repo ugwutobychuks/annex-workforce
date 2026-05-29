@@ -23,7 +23,7 @@ export default function ForgotPasswordPage() {
     return (
       <>
         <h1 className="font-display text-4xl mb-2">Check your inbox.</h1>
-        <p className="text-stone-600">
+        <p className="text-slate-600">
           If an account exists for that email, we've sent a reset link. The link will
           expire in 1 hour.
         </p>
@@ -35,7 +35,7 @@ export default function ForgotPasswordPage() {
   return (
     <>
       <h1 className="font-display text-4xl mb-2">Reset your password.</h1>
-      <p className="text-stone-600 mb-8">Enter your email and we'll send a reset link.</p>
+      <p className="text-slate-600 mb-8">Enter your email and we'll send a reset link.</p>
       <form onSubmit={onSubmit} className="space-y-5">
         <div>
           <label className="label">Email</label>
@@ -45,7 +45,7 @@ export default function ForgotPasswordPage() {
           {loading ? 'Sending…' : 'Send reset link'}
         </button>
       </form>
-      <Link href="/login" className="mt-6 inline-block text-sm text-forest-700 hover:underline">
+      <Link href="/login" className="mt-6 inline-block text-sm text-brand-700 hover:underline">
         ← Back to sign in
       </Link>
     </>

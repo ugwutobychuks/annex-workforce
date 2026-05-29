@@ -158,7 +158,7 @@ export class VerificationService {
     const records = await this.prisma.verificationRecord.findMany({
       where: { candidateId, status: 'VERIFIED' },
     });
-    const types = new Set(records.map((r) => r.type));
+    const types = new Set(records.map((r: { type: string }) => r.type));
 
     let level: 'EMAIL_VERIFIED' | 'IDENTITY_VERIFIED' | 'CREDENTIALS_VERIFIED' | 'FULLY_VERIFIED' =
       'EMAIL_VERIFIED';

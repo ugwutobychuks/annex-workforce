@@ -63,9 +63,9 @@ export default function VerificationPage() {
   return (
     <div className="space-y-8">
       <header>
-        <div className="text-xs uppercase tracking-[0.18em] text-stone-500 mb-2">Verification</div>
+        <div className="text-xs uppercase tracking-[0.18em] text-slate-500 mb-2">Verification</div>
         <h1 className="font-display text-4xl">Build trust with employers.</h1>
-        <p className="text-stone-600 mt-2">
+        <p className="text-slate-600 mt-2">
           Verified candidates appear in 4× more searches. Each step you complete raises your verification level.
         </p>
       </header>
@@ -76,12 +76,12 @@ export default function VerificationPage() {
           {level === 'FULLY_VERIFIED' ? (
             <ShieldCheck className="w-6 h-6 text-emerald-600" />
           ) : level === 'UNVERIFIED' ? (
-            <ShieldAlert className="w-6 h-6 text-ember-500" />
+            <ShieldAlert className="w-6 h-6 text-accent-500" />
           ) : (
-            <ShieldQuestion className="w-6 h-6 text-forest-700" />
+            <ShieldQuestion className="w-6 h-6 text-brand-700" />
           )}
           <div>
-            <div className="text-xs uppercase tracking-wider text-stone-500">Current level</div>
+            <div className="text-xs uppercase tracking-wider text-slate-500">Current level</div>
             <div className="font-display text-xl">{LEVEL_LABEL[level]}</div>
           </div>
         </div>
@@ -91,7 +91,7 @@ export default function VerificationPage() {
           {Object.keys(LEVEL_LABEL).map((key, i) => (
             <div
               key={key}
-              className={`flex-1 h-1.5 rounded-full ${i <= stepIndex ? 'bg-forest-700' : 'bg-stone-200'}`}
+              className={`flex-1 h-1.5 rounded-full ${i <= stepIndex ? 'bg-brand-700' : 'bg-slate-200'}`}
               title={LEVEL_LABEL[key]}
             />
           ))}
@@ -118,13 +118,13 @@ export default function VerificationPage() {
                         <span className="verified-badge"><CheckCircle2 className="w-3 h-3" /> Verified</span>
                       )}
                       {pending && !verified && (
-                        <span className="chip bg-sand-100 text-sand-700"><Clock className="w-3 h-3 inline mr-1" />In review</span>
+                        <span className="chip bg-amber-100 text-amber-700"><Clock className="w-3 h-3 inline mr-1" />In review</span>
                       )}
                       {failed && !verified && !pending && (
                         <span className="chip bg-red-50 text-red-700"><XCircle className="w-3 h-3 inline mr-1" />Failed</span>
                       )}
                     </div>
-                    <p className="text-sm text-stone-600 mt-1">{t.desc}</p>
+                    <p className="text-sm text-slate-600 mt-1">{t.desc}</p>
                   </div>
                   {!verified && !pending && (
                     <button
@@ -150,11 +150,11 @@ export default function VerificationPage() {
               <div key={r.id} className="card flex items-center justify-between text-sm">
                 <div>
                   <div className="font-medium">{r.type}</div>
-                  <div className="text-xs text-stone-500">via {r.provider} · {formatDate(r.initiatedAt)}</div>
+                  <div className="text-xs text-slate-500">via {r.provider} · {formatDate(r.initiatedAt)}</div>
                 </div>
                 <span className={`chip ${
                   r.status === 'VERIFIED' ? 'bg-emerald-50 text-emerald-800' :
-                  r.status === 'PENDING' ? 'bg-sand-100 text-sand-700' :
+                  r.status === 'PENDING' ? 'bg-amber-100 text-amber-700' :
                   'bg-red-50 text-red-700'
                 }`}>
                   {r.status.toLowerCase()}
@@ -172,7 +172,7 @@ export default function VerificationPage() {
             <h2 className="font-display text-xl mb-1">
               Verify {TYPES.find((t) => t.key === initiatingType)?.label}
             </h2>
-            <p className="text-sm text-stone-600 mb-5">
+            <p className="text-sm text-slate-600 mb-5">
               {TYPES.find((t) => t.key === initiatingType)?.desc}
             </p>
 
@@ -218,7 +218,7 @@ export default function VerificationPage() {
             )}
 
             {(initiatingType === 'EMPLOYMENT' || initiatingType === 'BACKGROUND') && (
-              <p className="text-sm text-stone-600 mb-5 bg-stone-50 rounded-md p-3">
+              <p className="text-sm text-slate-600 mb-5 bg-slate-50 rounded-md p-3">
                 We'll initiate the check using the contact details on your profile. This typically takes 3-5 business days.
               </p>
             )}

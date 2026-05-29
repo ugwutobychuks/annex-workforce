@@ -85,20 +85,20 @@ export class NotificationsService {
   private layout(title: string, body: string): string {
     return `
 <!doctype html><html><head><meta charset="utf-8"></head>
-<body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:600px;margin:0 auto;padding:24px;color:#1a1a1a;background:#faf8f3;">
-  <div style="border-bottom:2px solid #0a4d3c;padding-bottom:12px;margin-bottom:24px;">
-    <h1 style="margin:0;color:#0a4d3c;font-size:22px;font-family:Georgia,serif;">Annex Workforce</h1>
+<body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:600px;margin:0 auto;padding:24px;color:#1a1a1a;background:#f8fafc;">
+  <div style="border-bottom:2px solid #2563eb;padding-bottom:12px;margin-bottom:24px;">
+    <h1 style="margin:0;color:#2563eb;font-size:22px;font-family:'Manrope',sans-serif;">Annex Workforce</h1>
   </div>
-  <h2 style="font-size:18px;font-family:Georgia,serif;color:#0a1f17;">${title}</h2>
+  <h2 style="font-size:18px;font-family:'Manrope',sans-serif;color:#0f172a;">${title}</h2>
   ${body}
-  <hr style="margin:32px 0;border:none;border-top:1px solid #e8e2d3;" />
+  <hr style="margin:32px 0;border:none;border-top:1px solid #e2e8f0;" />
   <p style="font-size:12px;color:#888;">Annex Workforce · Trusted talent infrastructure for Africa<br />
   If you didn't expect this email, you can safely ignore it.</p>
 </body></html>`;
   }
 
   private button(href: string, label: string): string {
-    return `<p><a href="${href}" style="display:inline-block;background:#0a4d3c;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:500;">${label}</a></p>`;
+    return `<p><a href="${href}" style="display:inline-block;background:#2563eb;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:500;">${label}</a></p>`;
   }
 
   private renderTemplate(template: EmailTemplate | undefined, data: Record<string, unknown> = {}): string {
@@ -154,8 +154,8 @@ export class NotificationsService {
           `Update on your application: ${data.jobTitle}`,
           `<p>Hi ${data.firstName ?? 'there'},</p>
            <p>${data.companyName ?? 'The employer'} has moved your application for <strong>${data.jobTitle}</strong> to:</p>
-           <p style="font-size:18px;color:#0a4d3c;text-transform:capitalize;"><strong>${(data.status as string)?.toLowerCase().replace(/_/g, ' ')}</strong></p>
-           ${data.note ? `<p style="background:#f4ede0;padding:12px;border-radius:6px;">${data.note}</p>` : ''}
+           <p style="font-size:18px;color:#2563eb;text-transform:capitalize;"><strong>${(data.status as string)?.toLowerCase().replace(/_/g, ' ')}</strong></p>
+           ${data.note ? `<p style="background:#dbeafe;padding:12px;border-radius:6px;">${data.note}</p>` : ''}
            ${this.button(`${this.appUrl}/applications`, 'View application')}`,
         );
 
@@ -186,7 +186,7 @@ export class NotificationsService {
           `Leave request ${isApproved ? 'approved' : 'declined'}`,
           `<p>Hi ${data.firstName ?? 'there'},</p>
            <p>Your ${(data.type as string)?.toLowerCase()} leave request for <strong>${data.startDate} – ${data.endDate}</strong> (${data.days} working days) has been <strong style="color:${isApproved ? '#047857' : '#b91c1c'};">${isApproved ? 'approved' : 'declined'}</strong>.</p>
-           ${data.note ? `<p style="background:#f4ede0;padding:12px;border-radius:6px;"><strong>Manager note:</strong> ${data.note}</p>` : ''}
+           ${data.note ? `<p style="background:#dbeafe;padding:12px;border-radius:6px;"><strong>Manager note:</strong> ${data.note}</p>` : ''}
            ${this.button(`${this.appUrl}/leave`, 'View leave')}`,
         );
 

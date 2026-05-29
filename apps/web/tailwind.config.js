@@ -4,49 +4,50 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Annex brand: deep forest + sand + warm accent
-        forest: {
-          50: '#f0f7f4',
-          100: '#dcebe2',
-          200: '#bcd7c8',
-          300: '#90bba5',
-          400: '#5e9a7d',
-          500: '#3f7e62',
-          600: '#2d654d',
-          700: '#22513e',
-          800: '#1a4133',
-          900: '#0a4d3c',
-          950: '#062a21',
+        // Primary: corporate blue (Annex brand)
+        brand: {
+          50: '#eff6ff',
+          100: '#dbeafe',
+          200: '#bfdbfe',
+          300: '#93c5fd',
+          400: '#60a5fa',
+          500: '#3b82f6',
+          600: '#2563eb',  // primary CTA
+          700: '#1d4ed8',  // hover state
+          800: '#1e40af',
+          900: '#1e3a8a',
+          950: '#172554',
         },
-        sand: {
-          50: '#faf8f3',
-          100: '#f4ede0',
-          200: '#e8d8be',
-          300: '#dabd92',
-          400: '#cb9e66',
-          500: '#bf8649',
-          600: '#a86c3d',
+        // Secondary accent — light sky for backgrounds, hovers, chips
+        sky: {
+          50: '#f0f9ff',
+          100: '#e0f2fe',
+          200: '#bae6fd',
+          500: '#0ea5e9',
         },
-        ember: {
-          500: '#d97706',
-          600: '#c2570c',
+        // Warm CTA accent — amber/orange for "second-line" actions
+        accent: {
+          500: '#f59e0b',
+          600: '#d97706',
         },
       },
       fontFamily: {
-        display: ['"Fraunces"', 'Georgia', 'serif'],
-        sans: ['"Geist"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+        display: ['"Manrope"', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'],
+        sans: ['"Inter"', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'],
+        mono: ['"JetBrains Mono"', 'ui-monospace', 'SF Mono', 'monospace'],
       },
-      backgroundImage: {
-        'grain': "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.9'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
+      boxShadow: {
+        'soft': '0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(30, 58, 138, 0.06)',
+        'soft-lg': '0 4px 6px -1px rgba(0, 0, 0, 0.04), 0 20px 40px -12px rgba(30, 58, 138, 0.10)',
+        'glow-brand': '0 0 0 4px rgba(37, 99, 235, 0.12)',
       },
       animation: {
-        'fade-up': 'fadeUp 0.6s ease-out forwards',
+        'fade-up': 'fadeUp 0.5s ease-out forwards',
         'shimmer': 'shimmer 2s linear infinite',
       },
       keyframes: {
         fadeUp: {
-          '0%': { opacity: '0', transform: 'translateY(12px)' },
+          '0%': { opacity: '0', transform: 'translateY(8px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
         shimmer: {

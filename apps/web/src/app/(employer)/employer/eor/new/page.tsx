@@ -49,14 +49,14 @@ export default function NewEorContractPage() {
 
   return (
     <div className="space-y-6 max-w-3xl">
-      <Link href="/employer/eor" className="inline-flex items-center gap-1 text-sm text-stone-600 hover:text-forest-700">
+      <Link href="/employer/eor" className="inline-flex items-center gap-1 text-sm text-slate-600 hover:text-brand-700">
         <ArrowLeft className="w-4 h-4" /> All contracts
       </Link>
 
       <header>
-        <div className="text-xs uppercase tracking-[0.18em] text-stone-500 mb-2">New EOR contract</div>
+        <div className="text-xs uppercase tracking-[0.18em] text-slate-500 mb-2">New EOR contract</div>
         <h1 className="font-display text-4xl">Hire through Annex.</h1>
-        <p className="text-stone-600 mt-2">
+        <p className="text-slate-600 mt-2">
           Annex becomes the legal employer. We hold the contract, run payroll, and file taxes.
         </p>
       </header>
@@ -72,8 +72,8 @@ export default function NewEorContractPage() {
             className="input font-mono text-sm"
             placeholder="e.g. b7e6e2c0-..."
           />
-          <p className="text-xs text-stone-500 mt-1.5">
-            Find this in <Link href="/employer/talent" className="text-forest-700 hover:underline">Talent search</Link> or
+          <p className="text-xs text-slate-500 mt-1.5">
+            Find this in <Link href="/employer/talent" className="text-brand-700 hover:underline">Talent search</Link> or
             from the application detail when moving someone to "Hired".
           </p>
         </div>
@@ -130,32 +130,32 @@ export default function NewEorContractPage() {
         </div>
 
         {/* Cost preview */}
-        <div className="border-t border-stone-200 pt-5">
+        <div className="border-t border-slate-200 pt-5">
           <button
             type="button"
             onClick={() => setShowEstimate(!showEstimate)}
-            className="flex items-center gap-2 text-sm text-forest-700 hover:underline"
+            className="flex items-center gap-2 text-sm text-brand-700 hover:underline"
           >
             <Calculator className="w-4 h-4" />
             {showEstimate ? 'Hide' : 'Preview'} cost breakdown
           </button>
 
           {showEstimate && estimate && (
-            <div className="mt-4 bg-stone-50 rounded-md p-4 font-mono text-sm space-y-1.5">
+            <div className="mt-4 bg-slate-50 rounded-md p-4 font-mono text-sm space-y-1.5">
               <Row label="Gross monthly" value={formatNaira(estimate.grossSalary)} />
               <Row label="− Employee PAYE" value={formatNaira(estimate.payeTax)} muted />
               <Row label="− Employee pension (8%)" value={formatNaira(estimate.pensionEmployee)} muted />
               <Row label="− Employee NHF (2.5%)" value={formatNaira(estimate.nhf)} muted />
-              <hr className="my-2 border-stone-200" />
+              <hr className="my-2 border-slate-200" />
               <Row label="Net take-home" value={formatNaira(estimate.netSalary)} bold />
-              <hr className="my-2 border-stone-200" />
+              <hr className="my-2 border-slate-200" />
               <Row label="Employer pension (10%)" value={formatNaira(estimate.pensionEmployer)} muted />
               <Row label="Total employer cost / mo" value={formatNaira(estimate.totalEmployerCost)} bold />
             </div>
           )}
         </div>
 
-        <div className="flex justify-end gap-3 border-t border-stone-200 pt-5">
+        <div className="flex justify-end gap-3 border-t border-slate-200 pt-5">
           <Link href="/employer/eor" className="btn-secondary">Cancel</Link>
           <button type="submit" disabled={create.isPending} className="btn-primary">
             {create.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
@@ -169,7 +169,7 @@ export default function NewEorContractPage() {
 
 function Row({ label, value, muted, bold }: any) {
   return (
-    <div className={`flex justify-between ${muted ? 'text-stone-500' : ''} ${bold ? 'font-semibold text-forest-900' : ''}`}>
+    <div className={`flex justify-between ${muted ? 'text-slate-500' : ''} ${bold ? 'font-semibold text-brand-900' : ''}`}>
       <span>{label}</span>
       <span>{value}</span>
     </div>

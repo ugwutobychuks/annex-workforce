@@ -75,7 +75,7 @@ The payroll engine in `apps/api/src/payroll/tax-engine.service.ts` implements:
 ## Architecture
 
 - **`apps/api`** — NestJS 10, Prisma 5, PostgreSQL 16, JWT auth with refresh-token rotation, Redis-backed rate limiting, Elasticsearch for talent + job search (with Postgres fallback), S3-compatible storage (MinIO locally, AWS S3 in prod), Nodemailer for email (MailHog dev / SendGrid prod).
-- **`apps/web`** — Next.js 14 with App Router, route groups for `(auth)` / `(talent)` / `(employer)` / `(admin)`, Zustand for auth state, React Query for server state, Tailwind with a custom forest/sand/ember palette and Fraunces serif display font.
+- **`apps/web`** — Next.js 14 with App Router, route groups for `(auth)` / `(talent)` / `(employer)` / `(admin)`, Zustand for auth state, React Query for server state, Tailwind with a corporate-blue palette and Manrope/Inter typography for a clean SaaS aesthetic.
 
 See [`docs/DEPLOYMENT.md`](./docs/DEPLOYMENT.md) for production deployment.
 

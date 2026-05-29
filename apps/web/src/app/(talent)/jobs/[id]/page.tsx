@@ -35,12 +35,12 @@ export default function JobDetailPage() {
     onError: (e: any) => toast.error(e.message),
   });
 
-  if (isLoading) return <div className="text-stone-500">Loading…</div>;
+  if (isLoading) return <div className="text-slate-500">Loading…</div>;
   if (!job) return <div>Job not found</div>;
 
   return (
     <div className="space-y-8">
-      <Link href="/jobs" className="inline-flex items-center gap-1 text-sm text-stone-600 hover:text-forest-700">
+      <Link href="/jobs" className="inline-flex items-center gap-1 text-sm text-slate-600 hover:text-brand-700">
         <ArrowLeft className="w-4 h-4" /> All jobs
       </Link>
 
@@ -48,8 +48,8 @@ export default function JobDetailPage() {
         <div className="flex items-start justify-between gap-6">
           <div>
             <h1 className="font-display text-4xl">{job.title}</h1>
-            <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-stone-600">
-              <span className="font-medium text-forest-900">{job.employer?.name}</span>
+            <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-600">
+              <span className="font-medium text-brand-900">{job.employer?.name}</span>
               <span>·</span>
               <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" /> {job.location ?? job.country}</span>
               <span>·</span>
@@ -67,7 +67,7 @@ export default function JobDetailPage() {
                 ? `${formatNaira(job.salaryMin)} – ${formatNaira(job.salaryMax)}`
                 : '—'}
             </div>
-            <div className="text-xs text-stone-500 mt-1 capitalize">{(job.seniority ?? '').toLowerCase()}</div>
+            <div className="text-xs text-slate-500 mt-1 capitalize">{(job.seniority ?? '').toLowerCase()}</div>
           </div>
         </div>
 
@@ -92,14 +92,14 @@ export default function JobDetailPage() {
             <h3 className="font-display text-xl mb-3">Apply for this role</h3>
             {!user ? (
               <>
-                <p className="text-sm text-stone-600 mb-4">Sign in or create an account to apply.</p>
+                <p className="text-sm text-slate-600 mb-4">Sign in or create an account to apply.</p>
                 <Link href={`/login?next=/jobs/${id}`} className="btn-primary w-full">Sign in to apply</Link>
               </>
             ) : user.role !== 'CANDIDATE' ? (
-              <p className="text-sm text-stone-600">Only candidate accounts can apply.</p>
+              <p className="text-sm text-slate-600">Only candidate accounts can apply.</p>
             ) : !showApply ? (
               <>
-                <p className="text-sm text-stone-600 mb-4">
+                <p className="text-sm text-slate-600 mb-4">
                   We'll send your profile and resume on file. Add a cover letter to stand out.
                 </p>
                 <button onClick={() => setShowApply(true)} className="btn-primary w-full">
@@ -126,7 +126,7 @@ export default function JobDetailPage() {
                 </button>
               </>
             )}
-            <div className="mt-5 pt-4 border-t border-stone-100 text-xs text-stone-500 space-y-1">
+            <div className="mt-5 pt-4 border-t border-slate-100 text-xs text-slate-500 space-y-1">
               <div>Posted {formatDate(job.publishedAt)}</div>
               <div>{job._count?.applications ?? 0} applicants</div>
             </div>
@@ -141,7 +141,7 @@ function Section({ title, content }: { title: string; content: string }) {
   return (
     <section>
       <h2 className="font-display text-xl mb-3">{title}</h2>
-      <div className="prose prose-stone max-w-none whitespace-pre-line text-stone-700 leading-relaxed">
+      <div className="prose prose-stone max-w-none whitespace-pre-line text-slate-700 leading-relaxed">
         {content}
       </div>
     </section>

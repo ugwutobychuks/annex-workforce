@@ -56,9 +56,9 @@ export default function PayrollPage() {
   return (
     <div className="space-y-8">
       <header>
-        <div className="text-xs uppercase tracking-[0.18em] text-stone-500 mb-2">Payroll</div>
+        <div className="text-xs uppercase tracking-[0.18em] text-slate-500 mb-2">Payroll</div>
         <h1 className="font-display text-4xl">Pay your team.</h1>
-        <p className="text-stone-600 mt-2">PAYE, Pension, and NHF computed automatically per Nigerian tax law.</p>
+        <p className="text-slate-600 mt-2">PAYE, Pension, and NHF computed automatically per Nigerian tax law.</p>
       </header>
 
       {/* Estimator */}
@@ -75,21 +75,21 @@ export default function PayrollPage() {
               onChange={(e) => setEstimateGross(e.target.value)}
               className="input"
             />
-            <p className="text-xs text-stone-500 mt-2">
+            <p className="text-xs text-slate-500 mt-2">
               Calculations follow Finance Act 2020 PAYE bands and Pension Reform Act rates.
             </p>
           </div>
           {estimate && (
-            <div className="bg-stone-50 rounded-md p-4 font-mono text-sm space-y-1.5">
+            <div className="bg-slate-50 rounded-md p-4 font-mono text-sm space-y-1.5">
               <Row label="Gross" value={formatNaira(estimate.grossSalary)} />
               <Row label="Basic (50%)" value={formatNaira(estimate.basicSalary)} muted />
-              <hr className="my-2 border-stone-200" />
+              <hr className="my-2 border-slate-200" />
               <Row label="− PAYE" value={formatNaira(estimate.payeTax)} muted />
               <Row label="− Pension (8%)" value={formatNaira(estimate.pensionEmployee)} muted />
               <Row label="− NHF (2.5%)" value={formatNaira(estimate.nhf)} muted />
-              <hr className="my-2 border-stone-200" />
+              <hr className="my-2 border-slate-200" />
               <Row label="Net pay" value={formatNaira(estimate.netSalary)} bold />
-              <hr className="my-2 border-stone-200" />
+              <hr className="my-2 border-slate-200" />
               <Row label="Employer pension" value={formatNaira(estimate.pensionEmployer)} muted />
               <Row label="Total employer cost" value={formatNaira(estimate.totalEmployerCost)} bold />
             </div>
@@ -114,26 +114,26 @@ export default function PayrollPage() {
         <h2 className="font-display text-xl mb-4">Recent runs</h2>
         <div className="grid gap-3">
           {runs?.length === 0 && (
-            <div className="card text-center py-12 text-stone-500">No payroll runs yet.</div>
+            <div className="card text-center py-12 text-slate-500">No payroll runs yet.</div>
           )}
           {runs?.map((r) => (
             <div key={r.id} className="card">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <div className="font-medium font-mono">{r.period}</div>
-                  <div className="text-sm text-stone-500 mt-1">{r._count?.payslips ?? 0} payslips</div>
+                  <div className="text-sm text-slate-500 mt-1">{r._count?.payslips ?? 0} payslips</div>
                   <div className="grid grid-cols-3 gap-4 mt-3 text-sm font-mono">
                     <div>
-                      <div className="text-xs text-stone-500">Gross</div>
+                      <div className="text-xs text-slate-500">Gross</div>
                       <div>{formatNaira(r.totalGross)}</div>
                     </div>
                     <div>
-                      <div className="text-xs text-stone-500">Tax</div>
+                      <div className="text-xs text-slate-500">Tax</div>
                       <div>{formatNaira(r.totalTax)}</div>
                     </div>
                     <div>
-                      <div className="text-xs text-stone-500">Net</div>
-                      <div className="text-forest-900">{formatNaira(r.totalNet)}</div>
+                      <div className="text-xs text-slate-500">Net</div>
+                      <div className="text-brand-900">{formatNaira(r.totalNet)}</div>
                     </div>
                   </div>
                 </div>
@@ -141,7 +141,7 @@ export default function PayrollPage() {
                   <span className={`chip capitalize ${
                     r.status === 'COMPLETED' ? 'bg-emerald-50 text-emerald-800'
                     : r.status === 'APPROVED' ? 'bg-blue-50 text-blue-800'
-                    : 'bg-stone-100 text-stone-600'
+                    : 'bg-slate-100 text-slate-600'
                   }`}>
                     {r.status.toLowerCase()}
                   </span>
@@ -165,7 +165,7 @@ export default function PayrollPage() {
 
 function Row({ label, value, muted, bold }: any) {
   return (
-    <div className={`flex justify-between ${muted ? 'text-stone-500' : ''} ${bold ? 'font-semibold text-forest-900' : ''}`}>
+    <div className={`flex justify-between ${muted ? 'text-slate-500' : ''} ${bold ? 'font-semibold text-brand-900' : ''}`}>
       <span>{label}</span>
       <span>{value}</span>
     </div>

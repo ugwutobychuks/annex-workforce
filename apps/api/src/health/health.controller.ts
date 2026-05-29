@@ -20,7 +20,9 @@ export class HealthController {
   @HealthCheck()
   check() {
     return this.health.check([
-      () => this.prismaHealth.pingCheck('database', this.prisma),
+      // Cast: PrismaService extends PrismaClient, but the type isn't always
+      // visible across version skews; terminus uses a structural subset.
+      () => this.prismaHealth.pingCheck('database', this.prisma as never),
     ]);
   }
 
@@ -33,7 +35,7 @@ export class HealthController {
   @HealthCheck()
   readiness() {
     return this.health.check([
-      () => this.prismaHealth.pingCheck('database', this.prisma),
+      () => this.prismaHealth.pingCheck('database', this.prisma as never),
     ]);
   }
 }

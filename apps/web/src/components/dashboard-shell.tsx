@@ -65,13 +65,13 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen flex bg-[var(--bg)]">
+    <div className="min-h-screen flex bg-slate-50">
       {/* Sidebar */}
-      <aside className="w-64 border-r border-stone-200 bg-white/60 flex flex-col">
-        <div className="px-6 py-5 border-b border-stone-200">
+      <aside className="w-64 border-r border-slate-200 bg-white flex flex-col">
+        <div className="px-6 py-5 border-b border-slate-200">
           <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-sm bg-forest-900 flex items-center justify-center text-white font-display font-bold text-sm">A</div>
-            <span className="font-display text-lg font-semibold">Annex</span>
+            <div className="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center text-white font-display font-bold text-sm">A</div>
+            <span className="font-display text-lg font-bold">Annex</span>
           </Link>
         </div>
         <nav className="flex-1 p-3 space-y-0.5">
@@ -83,29 +83,29 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  'flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors',
+                  'flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors font-medium',
                   active
-                    ? 'bg-forest-900 text-white'
-                    : 'text-stone-700 hover:bg-stone-100',
+                    ? 'bg-brand-600 text-white shadow-soft'
+                    : 'text-slate-700 hover:bg-slate-100',
                 )}
               >
-                <Icon className={cn('w-4 h-4', active ? 'text-sand-300' : 'text-stone-500')} />
+                <Icon className={cn('w-4 h-4', active ? 'text-brand-100' : 'text-slate-500')} />
                 {item.label}
               </Link>
             );
           })}
         </nav>
-        <div className="p-3 border-t border-stone-200">
+        <div className="p-3 border-t border-slate-200">
           <div className="px-3 py-2 mb-2">
             <div className="text-sm font-medium truncate">{user.firstName} {user.lastName}</div>
-            <div className="text-xs text-stone-500 truncate">{user.email}</div>
+            <div className="text-xs text-slate-500 truncate">{user.email}</div>
             <div className="mt-1.5">
               <span className="chip text-[10px]">{user.role.replace('_', ' ')}</span>
             </div>
           </div>
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm text-stone-600 hover:bg-stone-100"
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-100"
           >
             <LogOut className="w-4 h-4" />
             Sign out

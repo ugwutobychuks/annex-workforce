@@ -70,7 +70,7 @@ export default function EmployerJobsPage() {
     <div className="space-y-8">
       <header className="flex items-center justify-between">
         <div>
-          <div className="text-xs uppercase tracking-[0.18em] text-stone-500 mb-2">Jobs</div>
+          <div className="text-xs uppercase tracking-[0.18em] text-slate-500 mb-2">Jobs</div>
           <h1 className="font-display text-4xl">Manage your roles.</h1>
         </div>
         <button onClick={() => setShowCreate(true)} className="btn-primary">
@@ -82,7 +82,7 @@ export default function EmployerJobsPage() {
       {showCreate && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4 overflow-auto">
           <div className="bg-white rounded-lg w-full max-w-2xl my-8 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200 sticky top-0 bg-white">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 sticky top-0 bg-white">
               <h2 className="font-display text-2xl">Create a job</h2>
               <button onClick={() => setShowCreate(false)}><X className="w-5 h-5" /></button>
             </div>
@@ -170,7 +170,7 @@ export default function EmployerJobsPage() {
                 <input name="isEor" type="checkbox" />
                 Hire through Annex EOR (we handle local employment)
               </label>
-              <div className="flex justify-end gap-2 pt-4 border-t border-stone-200">
+              <div className="flex justify-end gap-2 pt-4 border-t border-slate-200">
                 <button type="button" onClick={() => setShowCreate(false)} className="btn-secondary">Cancel</button>
                 <button type="submit" disabled={createJob.isPending} className="btn-primary">
                   {createJob.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
@@ -185,7 +185,7 @@ export default function EmployerJobsPage() {
       {/* Jobs list */}
       <div className="grid gap-3">
         {jobs?.length === 0 && (
-          <div className="card text-center py-16 text-stone-500">
+          <div className="card text-center py-16 text-slate-500">
             No jobs yet. Click "New job" to get started.
           </div>
         )}
@@ -194,22 +194,22 @@ export default function EmployerJobsPage() {
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h3 className="font-display text-xl">{j.title}</h3>
-                <div className="text-sm text-stone-600 mt-1 capitalize">
+                <div className="text-sm text-slate-600 mt-1 capitalize">
                   {j.workArrangement?.toLowerCase()} · {j.employmentType?.replace('_', ' ').toLowerCase()} · {j.seniority?.toLowerCase()}
                 </div>
-                <div className="text-sm text-stone-500 mt-2">
+                <div className="text-sm text-slate-500 mt-2">
                   {j._count?.applications ?? 0} applicants ·{' '}
                   {j.salaryMin && j.salaryMax ? `${formatNaira(j.salaryMin)} – ${formatNaira(j.salaryMax)}` : 'Salary not specified'}
                 </div>
                 <Link
                   href={`/employer/jobs/${j.id}`}
-                  className="inline-flex items-center gap-1.5 mt-3 text-sm text-forest-700 hover:underline"
+                  className="inline-flex items-center gap-1.5 mt-3 text-sm text-brand-700 hover:underline"
                 >
                   <Users className="w-3.5 h-3.5" /> View applicants
                 </Link>
               </div>
               <div className="text-right space-y-2">
-                <span className={`chip ${j.status === 'PUBLISHED' ? 'bg-emerald-50 text-emerald-800' : 'bg-stone-100 text-stone-600'}`}>
+                <span className={`chip ${j.status === 'PUBLISHED' ? 'bg-emerald-50 text-emerald-800' : 'bg-slate-100 text-slate-600'}`}>
                   {j.status.toLowerCase()}
                 </span>
                 <div className="flex gap-2 justify-end">

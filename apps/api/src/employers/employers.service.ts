@@ -7,7 +7,7 @@ export class EmployersService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(userId: string, dto: CreateEmployerDto) {
-    return this.prisma.$transaction(async (tx) => {
+    return this.prisma.$transaction(async (tx: any) => {
       const employer = await tx.employer.create({
         data: {
           name: dto.name,

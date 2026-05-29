@@ -31,14 +31,14 @@ export default function TalentSearchPage() {
   return (
     <div className="space-y-8">
       <header>
-        <div className="text-xs uppercase tracking-[0.18em] text-stone-500 mb-2">Talent search</div>
+        <div className="text-xs uppercase tracking-[0.18em] text-slate-500 mb-2">Talent search</div>
         <h1 className="font-display text-4xl">Find the right person.</h1>
-        <p className="text-stone-600 mt-2">Search verified candidates by skill, location, and availability.</p>
+        <p className="text-slate-600 mt-2">Search verified candidates by skill, location, and availability.</p>
       </header>
 
       <div className="card grid md:grid-cols-4 gap-3">
         <div className="md:col-span-2 relative">
-          <Search className="w-4 h-4 absolute left-3 top-3.5 text-stone-400" />
+          <Search className="w-4 h-4 absolute left-3 top-3.5 text-slate-400" />
           <input
             value={filters.q}
             onChange={(e) => { setFilters({ ...filters, q: e.target.value }); setPage(1); }}
@@ -71,18 +71,18 @@ export default function TalentSearchPage() {
       </div>
 
       {isLoading ? (
-        <div className="text-stone-500">Searching…</div>
+        <div className="text-slate-500">Searching…</div>
       ) : data?.hits?.length === 0 ? (
-        <div className="card text-center py-16 text-stone-500">No candidates match those filters.</div>
+        <div className="card text-center py-16 text-slate-500">No candidates match those filters.</div>
       ) : (
         <>
-          <div className="text-sm text-stone-500">{data?.total} candidates</div>
+          <div className="text-sm text-slate-500">{data?.total} candidates</div>
           <div className="grid gap-3">
             {data?.hits?.map((c: any) => (
               <div key={c.id} className="card">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-start gap-3 flex-1 min-w-0">
-                    <div className="w-12 h-12 rounded-full bg-forest-50 border border-forest-100 flex items-center justify-center font-display font-semibold text-forest-900 shrink-0">
+                    <div className="w-12 h-12 rounded-full bg-brand-50 border border-brand-100 flex items-center justify-center font-display font-semibold text-brand-900 shrink-0">
                       {(c.firstName?.[0] ?? '') + (c.lastName?.[0] ?? '')}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -92,8 +92,8 @@ export default function TalentSearchPage() {
                           <span className="verified-badge"><ShieldCheck className="w-3 h-3" /> Verified</span>
                         )}
                       </div>
-                      <div className="text-sm text-stone-600">{c.headline ?? '—'}</div>
-                      <div className="text-xs text-stone-500 mt-1 flex items-center gap-3 flex-wrap">
+                      <div className="text-sm text-slate-600">{c.headline ?? '—'}</div>
+                      <div className="text-xs text-slate-500 mt-1 flex items-center gap-3 flex-wrap">
                         {c.location && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> {c.location}</span>}
                         <span>{c.yearsOfExperience} yrs exp</span>
                         <span className="capitalize">{c.availability?.replace('_', ' ').toLowerCase()}</span>
@@ -112,7 +112,7 @@ export default function TalentSearchPage() {
                         navigator.clipboard.writeText(c.userId ?? c.id);
                         toast.success('User ID copied');
                       }}
-                      className="mt-2 inline-flex items-center gap-1 text-xs text-stone-500 hover:text-forest-700"
+                      className="mt-2 inline-flex items-center gap-1 text-xs text-slate-500 hover:text-brand-700"
                       title="Copy user ID for EOR contract"
                     >
                       <Copy className="w-3 h-3" /> Copy user ID

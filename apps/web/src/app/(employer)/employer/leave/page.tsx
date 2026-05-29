@@ -9,10 +9,10 @@ import { formatDate } from '@/lib/utils';
 import { Calendar, Check, X, Loader2 } from 'lucide-react';
 
 const STATUS_STYLES: Record<string, string> = {
-  PENDING: 'bg-sand-100 text-sand-700',
+  PENDING: 'bg-amber-100 text-amber-700',
   APPROVED: 'bg-emerald-50 text-emerald-800',
   REJECTED: 'bg-red-50 text-red-700',
-  CANCELLED: 'bg-stone-100 text-stone-500',
+  CANCELLED: 'bg-slate-100 text-slate-500',
 };
 
 export default function EmployerLeavePage() {
@@ -48,16 +48,16 @@ export default function EmployerLeavePage() {
   return (
     <div className="space-y-6">
       <header>
-        <div className="text-xs uppercase tracking-[0.18em] text-stone-500 mb-2">Time off</div>
+        <div className="text-xs uppercase tracking-[0.18em] text-slate-500 mb-2">Time off</div>
         <h1 className="font-display text-4xl">Approve team leave.</h1>
-        <p className="text-stone-600 mt-2">Review and decide on pending leave requests.</p>
+        <p className="text-slate-600 mt-2">Review and decide on pending leave requests.</p>
       </header>
 
       <div className="flex gap-2">
         <button
           onClick={() => setFilter('pending')}
           className={`px-3 py-1.5 rounded-md text-sm ${
-            filter === 'pending' ? 'bg-forest-900 text-white' : 'bg-white border border-stone-300 text-stone-700'
+            filter === 'pending' ? 'bg-brand-900 text-white' : 'bg-white border border-slate-300 text-slate-700'
           }`}
         >
           Pending
@@ -65,7 +65,7 @@ export default function EmployerLeavePage() {
         <button
           onClick={() => setFilter('all')}
           className={`px-3 py-1.5 rounded-md text-sm ${
-            filter === 'all' ? 'bg-forest-900 text-white' : 'bg-white border border-stone-300 text-stone-700'
+            filter === 'all' ? 'bg-brand-900 text-white' : 'bg-white border border-slate-300 text-slate-700'
           }`}
         >
           All requests
@@ -73,11 +73,11 @@ export default function EmployerLeavePage() {
       </div>
 
       {isLoading ? (
-        <div className="text-stone-500">Loading…</div>
+        <div className="text-slate-500">Loading…</div>
       ) : !requests || requests.length === 0 ? (
         <div className="card text-center py-16">
-          <Calendar className="w-10 h-10 mx-auto mb-3 text-stone-300" />
-          <p className="text-stone-500">
+          <Calendar className="w-10 h-10 mx-auto mb-3 text-slate-300" />
+          <p className="text-slate-500">
             {filter === 'pending' ? 'No pending requests.' : 'No leave requests yet.'}
           </p>
         </div>
@@ -87,8 +87,8 @@ export default function EmployerLeavePage() {
             <LeaveCard
               key={r.id}
               request={r}
-              onApprove={(note) => decide.mutate({ id: r.id, decision: 'APPROVED', note })}
-              onReject={(note) => decide.mutate({ id: r.id, decision: 'REJECTED', note })}
+              onApprove={(note?: string) => decide.mutate({ id: r.id, decision: 'APPROVED', note })}
+              onReject={(note?: string) => decide.mutate({ id: r.id, decision: 'REJECTED', note })}
               isPending={decide.isPending}
             />
           ))}
@@ -110,11 +110,11 @@ function LeaveCard({ request, onApprove, onReject, isPending }: any) {
             <span className="font-medium font-mono text-sm">Employee {request.employeeId.slice(0, 8)}</span>
             <span className="chip">{request.type}</span>
           </div>
-          <div className="text-sm text-stone-600">
+          <div className="text-sm text-slate-600">
             {formatDate(request.startDate)} → {formatDate(request.endDate)} ({request.daysRequested} working days)
           </div>
           {request.reason && (
-            <p className="text-sm text-stone-700 mt-2 italic">"{request.reason}"</p>
+            <p className="text-sm text-slate-700 mt-2 italic">"{request.reason}"</p>
           )}
         </div>
         <div className="text-right shrink-0 space-y-2">
@@ -142,7 +142,7 @@ function LeaveCard({ request, onApprove, onReject, isPending }: any) {
       </div>
 
       {showNote && request.status === 'PENDING' && (
-        <div className="mt-4 pt-4 border-t border-stone-200 space-y-3">
+        <div className="mt-4 pt-4 border-t border-slate-200 space-y-3">
           <textarea
             value={note}
             onChange={(e) => setNote(e.target.value)}

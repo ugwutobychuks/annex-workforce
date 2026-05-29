@@ -45,7 +45,7 @@ export default function VerificationQueuePage() {
   return (
     <div className="space-y-6">
       <header>
-        <div className="text-xs uppercase tracking-[0.18em] text-stone-500 mb-2">Verification</div>
+        <div className="text-xs uppercase tracking-[0.18em] text-slate-500 mb-2">Verification</div>
         <h1 className="font-display text-4xl">Review verification requests.</h1>
       </header>
 
@@ -55,7 +55,7 @@ export default function VerificationQueuePage() {
             key={s}
             onClick={() => setStatusFilter(s)}
             className={`px-3 py-1.5 rounded-md text-sm ${
-              statusFilter === s ? 'bg-forest-900 text-white' : 'bg-white border border-stone-300 text-stone-700'
+              statusFilter === s ? 'bg-brand-900 text-white' : 'bg-white border border-slate-300 text-slate-700'
             }`}
           >
             {s.toLowerCase()}
@@ -65,8 +65,8 @@ export default function VerificationQueuePage() {
 
       <div className="grid gap-3">
         {data?.items?.length === 0 && (
-          <div className="card text-center py-12 text-stone-500">
-            <ShieldCheck className="w-10 h-10 mx-auto mb-3 text-stone-300" />
+          <div className="card text-center py-12 text-slate-500">
+            <ShieldCheck className="w-10 h-10 mx-auto mb-3 text-slate-300" />
             No items match.
           </div>
         )}
@@ -78,13 +78,13 @@ export default function VerificationQueuePage() {
                   <span className="font-medium">
                     {v.candidate?.user?.firstName} {v.candidate?.user?.lastName}
                   </span>
-                  <span className="text-xs text-stone-500">{v.candidate?.user?.email}</span>
+                  <span className="text-xs text-slate-500">{v.candidate?.user?.email}</span>
                 </div>
-                <div className="text-sm text-stone-600 mt-1">
+                <div className="text-sm text-slate-600 mt-1">
                   {v.type} · provider: {v.provider} · initiated {formatDate(v.initiatedAt)}
                 </div>
                 {v.result && Object.keys(v.result).length > 0 && (
-                  <pre className="mt-3 bg-stone-50 rounded-md p-2 text-xs text-stone-700 overflow-x-auto">
+                  <pre className="mt-3 bg-slate-50 rounded-md p-2 text-xs text-slate-700 overflow-x-auto">
                     {JSON.stringify(v.result, null, 2)}
                   </pre>
                 )}

@@ -38,7 +38,7 @@ export default function AdminUsersPage() {
   return (
     <div className="space-y-6">
       <header>
-        <div className="text-xs uppercase tracking-[0.18em] text-stone-500 mb-2">Users</div>
+        <div className="text-xs uppercase tracking-[0.18em] text-slate-500 mb-2">Users</div>
         <h1 className="font-display text-4xl">User management.</h1>
       </header>
 
@@ -60,7 +60,7 @@ export default function AdminUsersPage() {
 
       <div className="card overflow-x-auto p-0">
         <table className="w-full text-sm">
-          <thead className="bg-stone-50 text-left text-xs uppercase tracking-wider text-stone-500">
+          <thead className="bg-slate-50 text-left text-xs uppercase tracking-wider text-slate-500">
             <tr>
               <th className="px-4 py-3">Name</th>
               <th className="px-4 py-3">Email</th>
@@ -70,22 +70,22 @@ export default function AdminUsersPage() {
               <th className="px-4 py-3"></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-stone-100">
+          <tbody className="divide-y divide-slate-100">
             {data?.items?.map((u: any) => (
-              <tr key={u.id} className="hover:bg-stone-50">
+              <tr key={u.id} className="hover:bg-slate-50">
                 <td className="px-4 py-3 font-medium">{u.firstName} {u.lastName}</td>
-                <td className="px-4 py-3 text-stone-600">{u.email}</td>
+                <td className="px-4 py-3 text-slate-600">{u.email}</td>
                 <td className="px-4 py-3"><span className="chip">{u.role}</span></td>
                 <td className="px-4 py-3">
                   <span className={`chip capitalize ${
                     u.status === 'ACTIVE' ? 'bg-emerald-50 text-emerald-800' :
                     u.status === 'SUSPENDED' ? 'bg-red-50 text-red-700' :
-                    'bg-stone-100 text-stone-600'
+                    'bg-slate-100 text-slate-600'
                   }`}>
                     {u.status.toLowerCase().replace('_', ' ')}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-xs text-stone-500">{formatDate(u.createdAt)}</td>
+                <td className="px-4 py-3 text-xs text-slate-500">{formatDate(u.createdAt)}</td>
                 <td className="px-4 py-3">
                   <select
                     value={u.status}
