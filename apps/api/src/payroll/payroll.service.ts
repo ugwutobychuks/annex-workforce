@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { EmployersService } from '../employers/employers.service';
@@ -46,7 +47,11 @@ export class PayrollService {
     });
 
     const totals = payslipData.reduce(
+<<<<<<< HEAD
       (acc: { gross: number; net: number; tax: number; pension: number }, p: any) => {
+=======
+      (acc: any, p: any) => {
+>>>>>>> db82deb7d6fc8de126410ed794a570ddf4b7196c
         acc.gross += p.calc.grossSalary;
         acc.net += p.calc.netSalary;
         acc.tax += p.calc.payeTax;
@@ -56,7 +61,11 @@ export class PayrollService {
       { gross: 0, net: 0, tax: 0, pension: 0 },
     );
 
+<<<<<<< HEAD
     return this.prisma.$transaction(async (tx: any) => {
+=======
+    return this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+>>>>>>> db82deb7d6fc8de126410ed794a570ddf4b7196c
       const run = await tx.payrollRun.create({
         data: {
           employerId: m.employerId,
@@ -209,7 +218,11 @@ export class PayrollService {
     });
     if (contracts.length === 0) return [];
     return this.prisma.payslip.findMany({
+<<<<<<< HEAD
       where: { contractId: { in: contracts.map((c: { id: string }) => c.id) } },
+=======
+      where: { contractId: { in: contracts.map((c: any) => c.id) } },
+>>>>>>> db82deb7d6fc8de126410ed794a570ddf4b7196c
       include: { payrollRun: true, contract: true },
       orderBy: { createdAt: 'desc' },
     });

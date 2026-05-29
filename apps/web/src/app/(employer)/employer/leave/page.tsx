@@ -87,8 +87,13 @@ export default function EmployerLeavePage() {
             <LeaveCard
               key={r.id}
               request={r}
+<<<<<<< HEAD
               onApprove={(note?: string) => decide.mutate({ id: r.id, decision: 'APPROVED', note })}
               onReject={(note?: string) => decide.mutate({ id: r.id, decision: 'REJECTED', note })}
+=======
+              onApprove={(note: string) => decide.mutate({ id: r.id, decision: 'APPROVED', note })}
+              onReject={(note: string) => decide.mutate({ id: r.id, decision: 'REJECTED', note })}
+>>>>>>> db82deb7d6fc8de126410ed794a570ddf4b7196c
               isPending={decide.isPending}
             />
           ))}

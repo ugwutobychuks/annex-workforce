@@ -127,7 +127,11 @@ export default function EmployerJobDetailPage() {
         <ApplicantDetail
           applicationId={selectedAppId}
           onClose={() => setSelectedAppId(null)}
+<<<<<<< HEAD
           onStatusChange={(status: string, note?: string) => {
+=======
+          onStatusChange={(status: string, note: string) => {
+>>>>>>> db82deb7d6fc8de126410ed794a570ddf4b7196c
             updateStatus.mutate({ appId: selectedAppId, status, note });
           }}
         />

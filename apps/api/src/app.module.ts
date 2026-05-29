@@ -16,7 +16,6 @@ import { CandidatesModule } from './candidates/candidates.module';
 import { EmployersModule } from './employers/employers.module';
 import { JobsModule } from './jobs/jobs.module';
 import { ApplicationsModule } from './applications/applications.module';
-import { VerificationModule } from './verification/verification.module';
 import { EorModule } from './eor/eor.module';
 import { PayrollModule } from './payroll/payroll.module';
 import { HrmsModule } from './hrms/hrms.module';
@@ -49,7 +48,6 @@ import { HealthController } from './health/health.controller';
     EmployersModule,
     JobsModule,
     ApplicationsModule,
-    VerificationModule,
     EorModule,
     PayrollModule,
     HrmsModule,

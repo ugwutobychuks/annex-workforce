@@ -9,8 +9,8 @@ COPY prisma ./prisma
 RUN npm ci
 
 # ─── builder ──────────────────────────────────────────────────
-FROM node:20-alpine AS builder
-RUN apk add --no-cache openssl
+FROM node:20 AS builder
+RUN apt-get update && apt-get install -y --no-install-recommends openssl && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
@@ -24,7 +24,7 @@ ENV NODE_ENV=production
 RUN addgroup -g 1001 nodejs && adduser -S -u 1001 -G nodejs nestjs
 
 COPY --from=deps /app/node_modules ./node_modules
-COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/apps/api/dist ./dist
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/package*.json ./
 

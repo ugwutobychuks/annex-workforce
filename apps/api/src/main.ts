@@ -24,7 +24,7 @@ async function bootstrap() {
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   });
 
-  app.setGlobalPrefix('v1', { exclude: ['health', 'health/(.*)'] });
+  app.setGlobalPrefix('v1', { exclude: ['health', 'health/liveness', 'health/readiness'] });
   app.enableVersioning({ type: VersioningType.URI });
 
   app.useGlobalPipes(
@@ -63,7 +63,7 @@ async function bootstrap() {
   await app.listen(port, host);
 
   Logger.log(`🚀 Annex API running on http://${host}:${port}`, 'Bootstrap');
-  Logger.log(`📚 API docs at  http://${host}:${port}/docs`, 'Bootstrap');
+  Logger.log(`📚 API docs at http://${host}:${port}/docs`, 'Bootstrap');
 }
 
 bootstrap().catch((err) => {

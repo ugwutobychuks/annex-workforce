@@ -1,0 +1,161 @@
+name: annex-workforce-prod
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: annex-postgres-prod
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-annex}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-annexpass}
+      POSTGRES_DB: ${POSTGRES_DB:-annex}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-annex}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - annex-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: annex-redis-prod
+    restart: always
+    command: redis-server --requirepass ${REDIS_PASSWORD:-redispass} --maxmemory 512mb --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data_prod:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-redispass}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - annex-network
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+    container_name: annex-elasticsearch-prod
+    restart: always
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+    ports:
+      - "9200:9200"
+    volumes:
+      - es_data_prod:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fs http://localhost:9200/_cluster/health || exit 1"]
+      interval: 20s
+      timeout: 10s
+      retries: 5
+    networks:
+      - annex-network
+
+  minio:
+    image: minio/minio:latest
+    container_name: annex-minio-prod
+    restart: always
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${S3_ACCESS_KEY:-annexminio}
+      MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY:-miniopassword}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data_prod:/data
+    networks:
+      - annex-network
+
+  minio-init:
+    image: minio/mc:latest
+    container_name: annex-minio-init-prod
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      sleep 5;
+      mc alias set local http://minio:9000 ${S3_ACCESS_KEY:-annexminio} ${S3_SECRET_KEY:-miniopassword};
+      mc mb -p local/annex-documents 2>/dev/null || true;
+      mc mb -p local/annex-verification 2>/dev/null || true;
+      mc anonymous set download local/annex-documents;
+      echo 'MinIO buckets ready';
+      "
+    networks:
+      - annex-network
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: annex-mailhog-prod
+    restart: always
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    networks:
+      - annex-network
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: annex-api-prod
+    restart: always
+    ports:
+      - "4000:4000"
+    env_file:
+      - .env.production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+      minio:
+        condition: service_started
+    networks:
+      - annex-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:4000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: http://98.84.56.161:4000
+    container_name: annex-web-prod
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+    networks:
+      - annex-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+volumes:
+  postgres_data_prod:
+  redis_data_prod:
+  es_data_prod:
+  minio_data_prod:
+
+networks:
+  annex-network:
+    driver: bridge

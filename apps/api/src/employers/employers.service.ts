@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateEmployerDto, UpdateEmployerDto } from './dto/employer.dto';
@@ -7,7 +8,11 @@ export class EmployersService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(userId: string, dto: CreateEmployerDto) {
+<<<<<<< HEAD
     return this.prisma.$transaction(async (tx: any) => {
+=======
+    return this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+>>>>>>> db82deb7d6fc8de126410ed794a570ddf4b7196c
       const employer = await tx.employer.create({
         data: {
           name: dto.name,
