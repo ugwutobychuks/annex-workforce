@@ -6,6 +6,10 @@ import NotFound from "./pages/NotFound.tsx";
 import RoleSelect from "./pages/onboarding/RoleSelect.tsx";
 import CandidateLayout from "./pages/candidate/layout.tsx";
 import CandidateDashboard from "./pages/candidate/dashboard/page.tsx";
+import CandidateProfile from "./pages/candidate/profile/page.tsx";
+import BrowseJobs from "./pages/candidate/jobs/page.tsx";
+import JobDetail from "./pages/candidate/jobs/[id]/page.tsx";
+import MyApplications from "./pages/candidate/applications/page.tsx";
 import EmployerLayout from "./pages/employer/layout.tsx";
 import EmployerDashboard from "./pages/employer/dashboard/page.tsx";
 import AdminLayout from "./pages/admin/layout.tsx";
@@ -23,6 +27,10 @@ export default function App() {
           {/* Candidate routes */}
           <Route path="/candidate" element={<CandidateLayout />}>
             <Route index element={<CandidateDashboard />} />
+            <Route path="profile" element={<CandidateProfile />} />
+            <Route path="jobs" element={<BrowseJobs />} />
+            <Route path="jobs/:id" element={<JobDetail />} />
+            <Route path="applications" element={<MyApplications />} />
           </Route>
 
           {/* Employer routes */}
