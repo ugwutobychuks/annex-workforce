@@ -1,8 +1,8 @@
 node_modules/
-.next/
 dist/
 build/
 out/
+.next/
 .env
 .env.local
 .env.*.local
@@ -14,4 +14,6 @@ coverage/
 *.tsbuildinfo
 .turbo/
 .cache/
-prisma/migrations/dev_*/
+# Note: convex/_generated/ IS committed per Convex best practice — it's
+# regenerated on every `npx convex dev` and provides type safety without
+# needing to run codegen first.

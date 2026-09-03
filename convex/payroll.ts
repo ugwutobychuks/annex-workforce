@@ -1,27 +1,22 @@
 import { v, ConvexError } from "convex/values";
 import { mutation, query, type MutationCtx, type QueryCtx } from "./_generated/server";
 import { paginationOptsValidator } from "convex/server";
+import { getAuthUserId } from "@convex-dev/auth/server";
 import { computePayslip } from "./lib/payeCalc";
 
 async function requireEmployer(ctx: QueryCtx | MutationCtx) {
-  const identity = await ctx.auth.getUserIdentity();
-  if (!identity) throw new ConvexError({ message: "Not authenticated", code: "UNAUTHENTICATED" });
-  const user = await ctx.db
-    .query("users")
-    .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))
-    .unique();
+  const userId = await getAuthUserId(ctx);
+  if (!userId) throw new ConvexError({ message: "Not authenticated", code: "UNAUTHENTICATED" });
+  const user = await ctx.db.get(userId);
   if (!user || user.role !== "employer")
     throw new ConvexError({ message: "Forbidden", code: "FORBIDDEN" });
   return user;
 }
 
 async function getCurrent(ctx: QueryCtx | MutationCtx) {
-  const identity = await ctx.auth.getUserIdentity();
-  if (!identity) return null;
-  return await ctx.db
-    .query("users")
-    .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))
-    .unique();
+  const userId = await getAuthUserId(ctx);
+  if (!userId) return null;
+  return await ctx.db.get(userId);
 }
 
 // ── Preview (pure function, safe for candidates + employers) ─────────────────

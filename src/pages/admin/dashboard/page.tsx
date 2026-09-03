@@ -21,8 +21,8 @@ export default function AdminDashboard() {
     );
   }
 
-  const candidates = users.filter((u) => u.role === "candidate").length;
-  const employers = users.filter((u) => u.role === "employer").length;
+  const candidates = users.filter((u: { role?: string }) => u.role === "candidate").length;
+  const employers = users.filter((u: { role?: string }) => u.role === "employer").length;
   const total = users.length;
 
   const stats = [

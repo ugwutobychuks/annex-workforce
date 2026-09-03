@@ -1,7 +1,7 @@
-import { v } from "convex/values";
+import { v, ConvexError } from "convex/values";
 import { mutation, query } from "./_generated/server";
-import { ConvexError } from "convex/values";
 import { paginationOptsValidator } from "convex/server";
+import { getAuthUserId } from "@convex-dev/auth/server";
 
 export const apply = mutation({
   args: {
@@ -9,13 +9,9 @@ export const apply = mutation({
     coverLetter: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new ConvexError({ message: "Not authenticated", code: "UNAUTHENTICATED" });
-
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))
-      .unique();
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new ConvexError({ message: "Not authenticated", code: "UNAUTHENTICATED" });
+    const user = await ctx.db.get(userId);
     if (!user) throw new ConvexError({ message: "User not found", code: "NOT_FOUND" });
     if (user.role !== "candidate")
       throw new ConvexError({ message: "Only candidates can apply", code: "FORBIDDEN" });
@@ -40,18 +36,12 @@ export const apply = mutation({
 export const getMyApplications = query({
   args: { paginationOpts: paginationOptsValidator },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return { page: [], isDone: true, continueCursor: "" };
-
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))
-      .unique();
-    if (!user) return { page: [], isDone: true, continueCursor: "" };
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return { page: [], isDone: true, continueCursor: "" };
 
     const result = await ctx.db
       .query("applications")
-      .withIndex("by_candidate", (q) => q.eq("candidateId", user._id))
+      .withIndex("by_candidate", (q) => q.eq("candidateId", userId))
       .order("desc")
       .paginate(args.paginationOpts);
 
@@ -69,19 +59,13 @@ export const getMyApplications = query({
 export const hasApplied = query({
   args: { jobId: v.id("jobs") },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return false;
-
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))
-      .unique();
-    if (!user) return false;
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return false;
 
     const existing = await ctx.db
       .query("applications")
       .withIndex("by_job_and_candidate", (q) =>
-        q.eq("jobId", args.jobId).eq("candidateId", user._id)
+        q.eq("jobId", args.jobId).eq("candidateId", userId)
       )
       .unique();
 

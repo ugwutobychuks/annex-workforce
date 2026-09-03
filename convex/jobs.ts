@@ -1,7 +1,7 @@
-import { v } from "convex/values";
+import { v, ConvexError } from "convex/values";
 import { mutation, query } from "./_generated/server";
-import { ConvexError } from "convex/values";
 import { paginationOptsValidator } from "convex/server";
+import { getAuthUserId } from "@convex-dev/auth/server";
 
 export const listPublished = query({
   args: {
@@ -11,18 +11,18 @@ export const listPublished = query({
   },
   handler: async (ctx, args) => {
     if (args.search) {
-      const results = await ctx.db
+      return await ctx.db
         .query("jobs")
-        .withSearchIndex("search_jobs", (q) => {
-          const base = q.search("title", args.search!).eq("status", "published");
-          return base;
-        })
+        .withSearchIndex("search_jobs", (q) =>
+          q.search("title", args.search!).eq("status", "published")
+        )
         .paginate(args.paginationOpts);
-      return results;
     }
-
-    const q = ctx.db.query("jobs").withIndex("by_status", (q) => q.eq("status", "published"));
-    return await q.order("desc").paginate(args.paginationOpts);
+    return await ctx.db
+      .query("jobs")
+      .withIndex("by_status", (q) => q.eq("status", "published"))
+      .order("desc")
+      .paginate(args.paginationOpts);
   },
 });
 
@@ -51,13 +51,9 @@ export const createJob = mutation({
     status: v.union(v.literal("draft"), v.literal("published")),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new ConvexError({ message: "Not authenticated", code: "UNAUTHENTICATED" });
-
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))
-      .unique();
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new ConvexError({ message: "Not authenticated", code: "UNAUTHENTICATED" });
+    const user = await ctx.db.get(userId);
     if (!user || user.role !== "employer")
       throw new ConvexError({ message: "Forbidden", code: "FORBIDDEN" });
 

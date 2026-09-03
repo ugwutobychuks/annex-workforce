@@ -2,72 +2,89 @@
 
 > Trusted talent infrastructure for Africa — verified marketplace, employer-of-record, and integrated HRMS in a single platform.
 
+**This branch (`local`) is the self-hosted build** — no Hercules, no managed platform. Run it on your machine with Convex Cloud's free dev deployment.
+
 ---
 
-## Hercules Rebuild (`hercules` branch)
-
-This branch is a **full rebuild** of the Annex Workforce platform on the [Hercules](https://hercules.app) stack. The original codebase (Next.js + NestJS + PostgreSQL) is incompatible with the Hercules platform, so the entire product is being rebuilt milestone-by-milestone using:
+## Stack
 
 | Layer | Technology |
 |-------|------------|
-| Frontend | Vite + React 19 + TypeScript |
-| Styling | Tailwind CSS 4 + shadcn UI |
+| Frontend | Vite 6 + React 19 + TypeScript |
+| Styling | Tailwind CSS 4 + shadcn/ui + Radix primitives |
 | Backend | Convex (serverless functions + reactive DB) |
-| Auth | Hercules Auth (OIDC) |
-| Hosting | Hercules Cloud |
-
-**Theme:** Manrope/Inter fonts, corporate-blue palette, dark sidebar, full light/dark mode support.
+| Auth | `@convex-dev/auth` — email + password |
+| Icons | lucide-react |
+| Forms | react-hook-form + zod |
 
 ---
 
-## Feature Status
+## First-time setup
 
-### Milestone 1 — Auth + Core Layout ✅ Built
-- Landing / marketing page
-- Hercules Auth integration (Google, email, etc.)
-- Role selection onboarding (`candidate` | `employer` | `admin`)
-- Shared dark sidebar + topbar for all roles
-- Route guards per role
-- Convex `users` table with `role` and `onboardingComplete`
+You need **Node ≥ 20** and a free Convex account (they'll prompt you to make one).
 
-### Milestone 2 — Candidate Flow ✅ Built
-- Candidate profile: basic info, skills, work experience, education
-- Browse Jobs: debounced search, filters, pagination
-- Job Detail page with Apply Now + cover letter
-- My Applications: status tracking across 7 pipeline stages
-- Convex tables: `candidateProfiles`, `workExperiences`, `educations`, `applications`
+```bash
+git clone https://github.com/ugwutobychuks/annex-workforce.git
+cd annex-workforce
+git checkout local
+npm install
+```
 
-### Milestone 3 — Employer Dashboard ✅ Built
-- Company profile setup (name, industry, size, HQ, website, description)
-- Job Postings: create / edit / delete, draft → publish → close status transitions
-- Applicant Pipeline: 7-column kanban board (Applied → Screening → Shortlisted → Interview → Offer → Hired → Rejected)
-- Applicant detail modal with cover letter viewer and inline status updates
-- Talent Pool: searchable candidate grid (name, headline, skills, verified badge)
-- Employer dashboard stats (total jobs, active, applications, hired)
-- Convex tables: `companyProfiles`, `jobs`
+Then start the Convex dev deployment. This is a one-time setup — it'll open a browser to log you into Convex, create a new dev project, write `.env.local` for you, and keep watching `convex/*.ts` for changes.
 
-### Milestone 4 — Admin Panel ✅ Built
-- User management: paginated list with search + role filter, role changes, ban / unban with reason
-- Verification queue: filterable by status; approve / reject with reviewer notes; flips `isVerified` on the underlying profile
-- Platform analytics: user / job / application / verification / EOR breakdowns with 7d and 30d growth
-- Candidates and employers self-request verification from their own profile page
-- Convex tables added: `verificationRequests`; `users.isBanned` + `banReason` fields
+```bash
+npx convex dev
+```
 
-### Milestone 5 — Payroll & EOR ✅ Built
-- **EOR contracts** — create for any candidate; per-contract pension rate, employer pension rate, NHF eligibility, start/end dates; draft → active → terminated lifecycle
-- **Payroll runs** — one-click run for a period (`YYYY-MM`); generates payslips for every active contract; draft runs are editable, `finalize` locks them
-- **Payslips** — full breakdown of gross / CRA / taxable / PAYE / employee pension / NHF / net + employer pension; candidates see their own with CSV download
-- **Nigerian PAYE calculator** — pure function in `convex/lib/payeCalc.ts` implementing Finance Act 2020 graduated bands (7% → 24%), Consolidated Relief Allowance (₦200k or 1% of gross, plus 20% of gross), 8%/10% pension, 2.5% NHF
-- Convex tables added: `eorContracts`, `payrollRuns`, `payslips`
+Leave that running in one terminal. In another terminal, start the web app:
+
+```bash
+npm run dev:web
+```
+
+Open http://localhost:5173.
+
+Both together (in one terminal):
+
+```bash
+npm run dev
+```
+
+---
+
+## Auth
+
+Email + password only — provided by `@convex-dev/auth`'s `Password` provider. Register on `/login`; sessions are cookie-based and survive reloads.
+
+The first account you create picks its own role via `/onboarding/role` (candidate or employer). To create an admin: register a normal account, then in the Convex dashboard's data tab, flip that user's `role` field to `"admin"`.
+
+---
+
+## Feature status
+
+### Milestone 1 — Auth + Core Layout ✅
+Landing page, sign-in / register, role selection, shared sidebar + topbar, per-role route guards.
+
+### Milestone 2 — Candidate Flow ✅
+Profile (basic + skills + experience + education), browse jobs (debounced search + filters + pagination), job detail + apply, application tracker across 7 pipeline stages.
+
+### Milestone 3 — Employer Dashboard ✅
+Company profile, job postings (draft → publish → close), 7-column kanban applicant pipeline, talent pool search, dashboard KPIs.
+
+### Milestone 4 — Admin Panel ✅
+User management (search + role filter + ban/unban), verification queue (approve/reject with reviewer notes), platform analytics with 7d + 30d growth, self-serve verification requests for candidates and employers.
+
+### Milestone 5 — Payroll & EOR ✅
+EOR contract lifecycle (draft → active → terminated), one-click monthly payroll runs generating payslips for every active contract, per-payslip breakdown with finalize, candidate payslip viewer with CSV export, Nigerian PAYE calculator (Finance Act 2020 bands + CRA + pension + NHF).
 
 ---
 
 ## Nigerian Payroll Compliance
 
-The payroll engine implements:
+The payroll engine (`convex/lib/payeCalc.ts`) implements:
 
 - **PAYE** — Finance Act 2020 graduated bands (7% → 24%)
-- **Consolidated Relief Allowance** — ₦200k or 1% of gross + 20% of gross
+- **Consolidated Relief Allowance** — max(₦200k, 1% of gross annual) + 20% of gross annual
 - **Pension** — 8% employee / 10% employer (Pension Reform Act 2014, per-contract configurable)
 - **NHF** — 2.5% of gross when the employee is NHF-eligible
 
@@ -75,37 +92,60 @@ The payroll engine implements:
 
 ---
 
-## Suggested Next Milestones
-
-Roadmap items that fit naturally on top of what's shipped:
-
-- **M6 — In-app messaging** between candidates and employers, threaded around a job application.
-- **M7 — Interview scheduling** with Google/Outlook calendar sync and self-serve booking links.
-- **M8 — Assessments & skills tests** for verifiable proficiency signals in the marketplace.
-- **M9 — Notifications** — email + in-app inbox for pipeline changes, new payslips, and verification decisions.
-- **M10 — Payments** via Paystack / Flutterwave for job-post fees, subscriptions, and EOR salary disbursement.
-- **M11 — E-signature** for offer letters and EOR contracts (integrate with a provider or build native).
-- **M12 — HRMS** — leave & time-off, attendance, org chart, document store.
-- **M13 — Ratings & reviews** on both sides after a hire completes.
-- **M14 — Mobile app** (Expo / React Native) reusing the Convex backend directly.
-- **M15 — AI features** — JD writer, resume parser, candidate-to-job matching, interview summarizer.
-- **M16 — Multi-country payroll** — Kenya, Ghana, South Africa, Egypt to match the "for Africa" positioning.
-
----
-
-## Original Codebase (`main` branch)
-
-The original implementation lives on `main` and uses:
+## Project layout
 
 ```
 annex-workforce/
-├── apps/
-│   ├── api/    NestJS + Prisma + PostgreSQL
-│   └── web/    Next.js 14 (App Router)
-└── docker-compose.yml
+├── convex/                Backend — functions + schema
+│   ├── auth.ts            @convex-dev/auth setup (Password provider)
+│   ├── auth.config.ts     Auth config (SITE_URL etc.)
+│   ├── http.ts            HTTP router (mounts auth endpoints)
+│   ├── schema.ts          Full data model (users, jobs, apps, contracts, payslips)
+│   ├── lib/payeCalc.ts    Pure Nigerian PAYE calculator
+│   ├── admin.ts           Admin queries + mutations
+│   ├── candidates.ts      Candidate profile CRUD
+│   ├── employer.ts        Company profile, jobs, applicants, talent pool
+│   ├── jobs.ts            Public job feed
+│   ├── applications.ts    Apply + list-my-applications
+│   ├── payroll.ts         EOR contracts + payroll runs + payslips
+│   ├── verification.ts    Self-serve verification requests
+│   ├── users.ts           Current-user + role selection
+│   └── _generated/        Auto-generated by `npx convex dev` — committed
+├── src/
+│   ├── main.tsx           Entry
+│   ├── App.tsx            Router
+│   ├── index.css          Tailwind + design tokens (light + dark)
+│   ├── lib/               cn helper + shared formatters
+│   ├── hooks/             use-auth, use-debounce
+│   ├── components/        Shared shell + shadcn/ui primitives
+│   └── pages/
+│       ├── auth/          Login, Callback (legacy)
+│       ├── onboarding/    Role picker
+│       ├── home/          Landing sections
+│       ├── candidate/     Dashboard, profile, jobs, applications, payslips
+│       ├── employer/      Dashboard, company, jobs, applicants, talent, payroll
+│       └── admin/         Dashboard, users, verification, analytics
+├── index.html
+├── vite.config.ts
+├── tailwind (Tailwind v4 uses `@import "tailwindcss"` — no separate JS config)
+└── tsconfig{,.app,.node}.json
 ```
 
-See `docs/DEPLOYMENT.md` on `main` for the original deployment guide.
+---
+
+## Suggested next milestones
+
+- **M6** — In-app messaging (candidate ↔ employer, threaded on applications)
+- **M7** — Interview scheduling with Google/Outlook sync
+- **M8** — Skills assessments & verified proficiency
+- **M9** — Notifications (email + in-app inbox)
+- **M10** — Payments via Paystack / Flutterwave (posting fees, EOR disbursement)
+- **M11** — E-signature for offer letters & EOR contracts
+- **M12** — HRMS — leave, attendance, org chart, document store
+- **M13** — Post-hire ratings & reviews (both sides)
+- **M14** — Mobile app (Expo / React Native on the same Convex backend)
+- **M15** — AI features — JD writer, resume parser, job / candidate matching
+- **M16** — Multi-country payroll (KE, GH, ZA, EG)
 
 ---
 

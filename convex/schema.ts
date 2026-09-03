@@ -1,18 +1,35 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
+import { authTables } from "@convex-dev/auth/server";
 
+/**
+ * Schema for Annex Workforce.
+ *
+ * `authTables` is spread in and provides: users, authAccounts, authSessions,
+ * authRefreshTokens, authVerificationCodes, authVerifiers, authRateLimits.
+ * We extend the `users` table with our app-level fields (role, banned, etc.)
+ * by overriding it below — Convex Auth merges field definitions.
+ */
 export default defineSchema({
+  ...authTables,
+
   users: defineTable({
-    tokenIdentifier: v.string(),
+    // Auth-managed fields (Convex Auth writes these):
     name: v.optional(v.string()),
+    image: v.optional(v.string()),
     email: v.optional(v.string()),
+    emailVerificationTime: v.optional(v.number()),
+    phone: v.optional(v.string()),
+    phoneVerificationTime: v.optional(v.number()),
+    isAnonymous: v.optional(v.boolean()),
+    // App-level fields:
     role: v.optional(v.union(v.literal("candidate"), v.literal("employer"), v.literal("admin"))),
     avatarUrl: v.optional(v.string()),
     onboardingComplete: v.optional(v.boolean()),
     isBanned: v.optional(v.boolean()),
     banReason: v.optional(v.string()),
   })
-    .index("by_token", ["tokenIdentifier"])
+    .index("email", ["email"])
     .index("by_role", ["role"]),
 
   companyProfiles: defineTable({
@@ -100,7 +117,6 @@ export default defineSchema({
     .index("by_candidate", ["candidateId"])
     .index("by_job_and_candidate", ["jobId", "candidateId"]),
 
-  // ── Milestone 4: verification queue ─────────────────────────────────────────
   verificationRequests: defineTable({
     subjectUserId: v.id("users"),
     subjectType: v.union(v.literal("candidate"), v.literal("employer")),
@@ -114,16 +130,15 @@ export default defineSchema({
     .index("by_status", ["status"])
     .index("by_subject", ["subjectUserId"]),
 
-  // ── Milestone 5: EOR + payroll ──────────────────────────────────────────────
   eorContracts: defineTable({
     employerId: v.id("users"),
     candidateId: v.id("users"),
     jobTitle: v.string(),
     grossMonthlyNGN: v.number(),
-    startDate: v.string(), // YYYY-MM-DD
+    startDate: v.string(),
     endDate: v.optional(v.string()),
-    pensionRatePct: v.number(), // employee share, typically 8
-    employerPensionRatePct: v.number(), // typically 10
+    pensionRatePct: v.number(),
+    employerPensionRatePct: v.number(),
     nhfEligible: v.boolean(),
     status: v.union(v.literal("draft"), v.literal("active"), v.literal("terminated")),
     terminatedAt: v.optional(v.number()),
@@ -135,7 +150,7 @@ export default defineSchema({
 
   payrollRuns: defineTable({
     employerId: v.id("users"),
-    period: v.string(), // YYYY-MM
+    period: v.string(),
     runAt: v.number(),
     status: v.union(v.literal("draft"), v.literal("finalized")),
     totalGross: v.number(),
@@ -163,7 +178,7 @@ export default defineSchema({
     nhf: v.number(),
     net: v.number(),
     employerPension: v.number(),
-    breakdown: v.string(), // JSON of PAYE bands applied
+    breakdown: v.string(),
   })
     .index("by_run", ["runId"])
     .index("by_candidate", ["candidateId"])

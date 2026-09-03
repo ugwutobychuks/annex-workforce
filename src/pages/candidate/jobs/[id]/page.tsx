@@ -89,7 +89,7 @@ export default function JobDetail() {
 
       {job.skills.length > 0 && (
         <div className="flex flex-wrap gap-2">
-          {job.skills.map((s) => <Badge key={s} variant="secondary">{s}</Badge>)}
+          {job.skills.map((s: string) => <Badge key={s} variant="secondary">{s}</Badge>)}
         </div>
       )}
 

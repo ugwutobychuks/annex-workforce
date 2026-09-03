@@ -247,7 +247,7 @@ function WorkExperienceSection({ userId }: { userId: string }) {
         ) : (data?.experiences ?? []).length === 0 ? (
           <p className="text-sm text-muted-foreground">No work experience added yet.</p>
         ) : (
-          (data?.experiences ?? []).map((exp) => (
+          (data?.experiences ?? []).map((exp: any) => (
             <div key={exp._id} className="flex items-start justify-between border-b pb-3 last:border-0 last:pb-0">
               <div>
                 <p className="font-semibold text-sm">{exp.title}</p>
@@ -335,7 +335,7 @@ function EducationSection({ userId }: { userId: string }) {
         ) : (data?.educations ?? []).length === 0 ? (
           <p className="text-sm text-muted-foreground">No education added yet.</p>
         ) : (
-          (data?.educations ?? []).map((edu) => (
+          (data?.educations ?? []).map((edu: any) => (
             <div key={edu._id} className="flex items-start justify-between border-b pb-3 last:border-0 last:pb-0">
               <div>
                 <p className="font-semibold text-sm">{edu.degree} in {edu.field}</p>

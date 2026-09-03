@@ -1,18 +1,18 @@
-import { v } from "convex/values";
+import { v, ConvexError } from "convex/values";
 import { mutation, query, type MutationCtx, type QueryCtx } from "./_generated/server";
-import { ConvexError } from "convex/values";
 import { paginationOptsValidator } from "convex/server";
+import { getAuthUserId } from "@convex-dev/auth/server";
 
-// ── helpers ──────────────────────────────────────────────────────────────────
+async function getCurrentUser(ctx: QueryCtx | MutationCtx) {
+  const userId = await getAuthUserId(ctx);
+  if (!userId) return null;
+  return await ctx.db.get(userId);
+}
 
-async function getEmployerUser(ctx: QueryCtx | MutationCtx) {
-  const identity = await ctx.auth.getUserIdentity();
-  if (!identity) throw new ConvexError({ message: "Not authenticated", code: "UNAUTHENTICATED" });
-  const user = await ctx.db
-    .query("users")
-    .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))
-    .unique();
-  if (!user || user.role !== "employer")
+async function requireEmployer(ctx: QueryCtx | MutationCtx) {
+  const user = await getCurrentUser(ctx);
+  if (!user) throw new ConvexError({ message: "Not authenticated", code: "UNAUTHENTICATED" });
+  if (user.role !== "employer")
     throw new ConvexError({ message: "Forbidden", code: "FORBIDDEN" });
   return user;
 }
@@ -22,12 +22,7 @@ async function getEmployerUser(ctx: QueryCtx | MutationCtx) {
 export const getCompanyProfile = query({
   args: {},
   handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return null;
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))
-      .unique();
+    const user = await getCurrentUser(ctx);
     if (!user) return null;
     return await ctx.db
       .query("companyProfiles")
@@ -46,15 +41,7 @@ export const upsertCompanyProfile = mutation({
     location: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new ConvexError({ message: "Not authenticated", code: "UNAUTHENTICATED" });
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))
-      .unique();
-    if (!user || user.role !== "employer")
-      throw new ConvexError({ message: "Forbidden", code: "FORBIDDEN" });
-
+    const user = await requireEmployer(ctx);
     const existing = await ctx.db
       .query("companyProfiles")
       .withIndex("by_employer", (q) => q.eq("employerId", user._id))
@@ -74,14 +61,8 @@ export const upsertCompanyProfile = mutation({
 export const listMyJobs = query({
   args: { paginationOpts: paginationOptsValidator },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return { page: [], isDone: true, continueCursor: "" };
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))
-      .unique();
+    const user = await getCurrentUser(ctx);
     if (!user) return { page: [], isDone: true, continueCursor: "" };
-
     return await ctx.db
       .query("jobs")
       .withIndex("by_employer", (q) => q.eq("employerId", user._id))
@@ -109,19 +90,10 @@ export const updateJob = mutation({
     status: v.union(v.literal("draft"), v.literal("published"), v.literal("closed")),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new ConvexError({ message: "Not authenticated", code: "UNAUTHENTICATED" });
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))
-      .unique();
-    if (!user || user.role !== "employer")
-      throw new ConvexError({ message: "Forbidden", code: "FORBIDDEN" });
-
+    const user = await requireEmployer(ctx);
     const job = await ctx.db.get(args.id);
     if (!job || job.employerId !== user._id)
       throw new ConvexError({ message: "Not found", code: "NOT_FOUND" });
-
     const { id, ...fields } = args;
     await ctx.db.patch(id, fields);
   },
@@ -133,19 +105,10 @@ export const updateJobStatus = mutation({
     status: v.union(v.literal("draft"), v.literal("published"), v.literal("closed")),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new ConvexError({ message: "Not authenticated", code: "UNAUTHENTICATED" });
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))
-      .unique();
-    if (!user || user.role !== "employer")
-      throw new ConvexError({ message: "Forbidden", code: "FORBIDDEN" });
-
+    const user = await requireEmployer(ctx);
     const job = await ctx.db.get(args.id);
     if (!job || job.employerId !== user._id)
       throw new ConvexError({ message: "Not found", code: "NOT_FOUND" });
-
     await ctx.db.patch(args.id, { status: args.status });
   },
 });
@@ -153,19 +116,10 @@ export const updateJobStatus = mutation({
 export const deleteJob = mutation({
   args: { id: v.id("jobs") },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new ConvexError({ message: "Not authenticated", code: "UNAUTHENTICATED" });
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))
-      .unique();
-    if (!user || user.role !== "employer")
-      throw new ConvexError({ message: "Forbidden", code: "FORBIDDEN" });
-
+    const user = await requireEmployer(ctx);
     const job = await ctx.db.get(args.id);
     if (!job || job.employerId !== user._id)
       throw new ConvexError({ message: "Not found", code: "NOT_FOUND" });
-
     await ctx.db.delete(args.id);
   },
 });
@@ -175,14 +129,8 @@ export const deleteJob = mutation({
 export const getApplicantsByJob = query({
   args: { jobId: v.id("jobs") },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return [];
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))
-      .unique();
+    const user = await getCurrentUser(ctx);
     if (!user || user.role !== "employer") return [];
-
     const job = await ctx.db.get(args.jobId);
     if (!job || job.employerId !== user._id) return [];
 
@@ -220,22 +168,12 @@ export const updateApplicationStatus = mutation({
     ),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new ConvexError({ message: "Not authenticated", code: "UNAUTHENTICATED" });
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))
-      .unique();
-    if (!user || user.role !== "employer")
-      throw new ConvexError({ message: "Forbidden", code: "FORBIDDEN" });
-
+    const user = await requireEmployer(ctx);
     const application = await ctx.db.get(args.applicationId);
     if (!application) throw new ConvexError({ message: "Not found", code: "NOT_FOUND" });
-
     const job = await ctx.db.get(application.jobId);
     if (!job || job.employerId !== user._id)
       throw new ConvexError({ message: "Forbidden", code: "FORBIDDEN" });
-
     await ctx.db.patch(args.applicationId, { status: args.status });
   },
 });
@@ -248,12 +186,7 @@ export const searchTalentPool = query({
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return { page: [], isDone: true, continueCursor: "" };
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))
-      .unique();
+    const user = await getCurrentUser(ctx);
     if (!user || user.role !== "employer")
       return { page: [], isDone: true, continueCursor: "" };
 
@@ -292,12 +225,7 @@ export const searchTalentPool = query({
 export const getDashboardStats = query({
   args: {},
   handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return null;
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))
-      .unique();
+    const user = await getCurrentUser(ctx);
     if (!user || user.role !== "employer") return null;
 
     const jobs = await ctx.db

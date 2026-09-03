@@ -52,7 +52,7 @@ export default function TalentPool() {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {talents.map(({ user, profile }) => (
+          {talents.map(({ user, profile }: { user: any; profile: any }) => (
             <Card key={user._id} className="hover:border-primary/40 transition-colors">
               <CardHeader className="pb-2">
                 <div className="flex items-start gap-3">
@@ -80,7 +80,7 @@ export default function TalentPool() {
                 )}
                 {profile && profile.skills.length > 0 ? (
                   <div className="flex flex-wrap gap-1.5">
-                    {profile.skills.slice(0, 4).map((s) => (
+                    {profile.skills.slice(0, 4).map((s: string) => (
                       <Badge key={s} variant="secondary" className="text-xs">{s}</Badge>
                     ))}
                     {profile.skills.length > 4 && (

@@ -220,7 +220,7 @@ export default function PayrollPage() {
     }
   };
 
-  const activeCount = (contracts ?? []).filter((c) => c.status === "active").length;
+  const activeCount = (contracts ?? []).filter((c: Contract) => c.status === "active").length;
 
   return (
     <div className="space-y-8">

@@ -1,20 +1,16 @@
 import { v, ConvexError } from "convex/values";
 import { mutation, query, type MutationCtx, type QueryCtx } from "./_generated/server";
 import { paginationOptsValidator } from "convex/server";
+import { getAuthUserId } from "@convex-dev/auth/server";
 
 async function requireAdmin(ctx: QueryCtx | MutationCtx) {
-  const identity = await ctx.auth.getUserIdentity();
-  if (!identity) throw new ConvexError({ message: "Not authenticated", code: "UNAUTHENTICATED" });
-  const user = await ctx.db
-    .query("users")
-    .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))
-    .unique();
+  const userId = await getAuthUserId(ctx);
+  if (!userId) throw new ConvexError({ message: "Not authenticated", code: "UNAUTHENTICATED" });
+  const user = await ctx.db.get(userId);
   if (!user || user.role !== "admin")
     throw new ConvexError({ message: "Forbidden", code: "FORBIDDEN" });
   return user;
 }
-
-// ── user management ───────────────────────────────────────────────────────────
 
 export const listUsers = query({
   args: {
@@ -38,8 +34,7 @@ export const listUsers = query({
     return {
       ...page,
       page: page.page.filter(
-        (u) =>
-          u.name?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q)
+        (u) => u.name?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q)
       ),
     };
   },
@@ -52,9 +47,8 @@ export const setUserRole = mutation({
   },
   handler: async (ctx, args) => {
     const admin = await requireAdmin(ctx);
-    if (args.userId === admin._id && args.role !== "admin") {
+    if (args.userId === admin._id && args.role !== "admin")
       throw new ConvexError({ message: "Cannot demote yourself", code: "CONFLICT" });
-    }
     await ctx.db.patch(args.userId, { role: args.role, onboardingComplete: true });
   },
 });
@@ -67,17 +61,14 @@ export const setUserBanned = mutation({
   },
   handler: async (ctx, args) => {
     const admin = await requireAdmin(ctx);
-    if (args.userId === admin._id) {
+    if (args.userId === admin._id)
       throw new ConvexError({ message: "Cannot ban yourself", code: "CONFLICT" });
-    }
     await ctx.db.patch(args.userId, {
       isBanned: args.banned,
       banReason: args.banned ? args.reason : undefined,
     });
   },
 });
-
-// ── verification queue ────────────────────────────────────────────────────────
 
 export const listVerifications = query({
   args: {
@@ -156,8 +147,6 @@ export const reviewVerification = mutation({
     }
   },
 });
-
-// ── platform analytics ────────────────────────────────────────────────────────
 
 export const getPlatformAnalytics = query({
   args: {},

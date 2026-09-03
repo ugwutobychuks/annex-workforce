@@ -1,18 +1,13 @@
 import { v, ConvexError } from "convex/values";
 import { mutation, query } from "./_generated/server";
-
-// Any authenticated candidate or employer can request verification of themselves.
-// Only one active pending request is allowed at a time per user.
+import { getAuthUserId } from "@convex-dev/auth/server";
 
 export const getMyVerificationStatus = query({
   args: {},
   handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return null;
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))
-      .unique();
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
+    const user = await ctx.db.get(userId);
     if (!user) return null;
 
     const requests = await ctx.db
@@ -46,12 +41,9 @@ export const requestVerification = mutation({
     documentUrl: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new ConvexError({ message: "Not authenticated", code: "UNAUTHENTICATED" });
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))
-      .unique();
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new ConvexError({ message: "Not authenticated", code: "UNAUTHENTICATED" });
+    const user = await ctx.db.get(userId);
     if (!user) throw new ConvexError({ message: "User not found", code: "NOT_FOUND" });
     if (user.role !== "candidate" && user.role !== "employer")
       throw new ConvexError({ message: "Verification not available for this role", code: "FORBIDDEN" });

@@ -103,7 +103,7 @@ export default function PayrollRunDetail() {
           <p className="text-muted-foreground text-sm">No payslips in this run.</p>
         ) : (
           <div className="grid gap-2">
-            {payslips.map((p) => (
+            {payslips.map((p: any) => (
               <Card key={p._id}>
                 <CardContent className="py-3 grid grid-cols-2 md:grid-cols-6 items-center gap-3 text-sm">
                   <div className="col-span-2 flex items-center gap-2 min-w-0">
