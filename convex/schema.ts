@@ -13,6 +13,18 @@ export default defineSchema({
     .index("by_token", ["tokenIdentifier"])
     .index("by_role", ["role"]),
 
+  companyProfiles: defineTable({
+    employerId: v.id("users"),
+    name: v.string(),
+    industry: v.optional(v.string()),
+    size: v.optional(v.string()),
+    website: v.optional(v.string()),
+    description: v.optional(v.string()),
+    location: v.optional(v.string()),
+    logoUrl: v.optional(v.string()),
+    isVerified: v.optional(v.boolean()),
+  }).index("by_employer", ["employerId"]),
+
   candidateProfiles: defineTable({
     userId: v.id("users"),
     headline: v.optional(v.string()),

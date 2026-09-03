@@ -12,6 +12,10 @@ import JobDetail from "./pages/candidate/jobs/[id]/page.tsx";
 import MyApplications from "./pages/candidate/applications/page.tsx";
 import EmployerLayout from "./pages/employer/layout.tsx";
 import EmployerDashboard from "./pages/employer/dashboard/page.tsx";
+import CompanyProfile from "./pages/employer/company/page.tsx";
+import JobPostings from "./pages/employer/jobs/page.tsx";
+import ApplicantsPage from "./pages/employer/applicants/page.tsx";
+import TalentPool from "./pages/employer/talent/page.tsx";
 import AdminLayout from "./pages/admin/layout.tsx";
 import AdminDashboard from "./pages/admin/dashboard/page.tsx";
 
@@ -36,6 +40,10 @@ export default function App() {
           {/* Employer routes */}
           <Route path="/employer" element={<EmployerLayout />}>
             <Route index element={<EmployerDashboard />} />
+            <Route path="company" element={<CompanyProfile />} />
+            <Route path="jobs" element={<JobPostings />} />
+            <Route path="applicants" element={<ApplicantsPage />} />
+            <Route path="talent" element={<TalentPool />} />
           </Route>
 
           {/* Admin routes */}
