@@ -2,94 +2,91 @@
 
 > Trusted talent infrastructure for Africa — verified marketplace, employer-of-record, and integrated HRMS in a single platform.
 
-## What's in here
+---
 
-A monorepo containing two deployable apps:
+## Hercules Rebuild (`hercules` branch)
+
+This branch is a **full rebuild** of the Annex Workforce platform on the [Hercules](https://hercules.app) stack. The original codebase (Next.js + NestJS + PostgreSQL) is incompatible with the Hercules platform, so the entire product is being rebuilt milestone-by-milestone using:
+
+| Layer | Technology |
+|-------|------------|
+| Frontend | Vite + React 19 + TypeScript |
+| Styling | Tailwind CSS 4 + shadcn UI |
+| Backend | Convex (serverless functions + reactive DB) |
+| Auth | Hercules Auth (OIDC) |
+| Hosting | Hercules Cloud |
+
+**Theme:** Manrope/Inter fonts, corporate-blue palette, dark sidebar, full light/dark mode support.
+
+---
+
+## Feature Status
+
+### Milestone 1 — Auth + Core Layout ✅ Built
+- Landing / marketing page
+- Hercules Auth integration (Google, email, etc.)
+- Role selection onboarding (`candidate` | `employer` | `admin`)
+- Shared dark sidebar + topbar for all roles
+- Route guards per role
+- Convex `users` table with `role` and `onboardingComplete`
+
+### Milestone 2 — Candidate Flow ✅ Built
+- Candidate profile: basic info, skills, work experience, education
+- Browse Jobs: debounced search, filters, pagination
+- Job Detail page with Apply Now + cover letter
+- My Applications: status tracking across 7 pipeline stages
+- Convex tables: `candidateProfiles`, `workExperiences`, `educations`, `applications`
+
+### Milestone 3 — Employer Dashboard ✅ Built
+- Company profile setup (name, industry, size, HQ, website, description)
+- Job Postings: create / edit / delete, draft → publish → close status transitions
+- Applicant Pipeline: 7-column kanban board (Applied → Screening → Shortlisted → Interview → Offer → Hired → Rejected)
+- Applicant detail modal with cover letter viewer and inline status updates
+- Talent Pool: searchable candidate grid (name, headline, skills, verified badge)
+- Employer dashboard stats (total jobs, active, applications, hired)
+- Convex tables: `companyProfiles`, `jobs`
+
+### Milestone 4 — Admin Panel 🔲 Pending
+- User management: list all users, change roles, view profiles
+- Verification queue: approve / reject candidate and company profile verifications
+- Platform-wide analytics dashboard (users, jobs, applications, hires)
+
+### Milestone 5 — Payroll & EOR 🔲 Pending
+- Employer-of-Record contract creation
+- Monthly payroll runs with Nigerian PAYE / Pension / NHF computation
+- Payslip generation and disbursement approval flow
+- Leave / time-off requests and approvals
+
+---
+
+## Nigerian Payroll Compliance (planned for Milestone 5)
+
+The payroll engine will implement:
+
+- **PAYE** — Finance Act 2020 graduated bands (7% → 24%)
+- **Consolidated Relief Allowance** — ₦200k or 1% of gross + 20% of gross-after-statutory
+- **Pension** — 8% employee / 10% employer (Pension Reform Act 2014)
+- **NHF** — 2.5% of basic salary when threshold is met
+
+> ⚠️ Tax law evolves. Always verify against current FIRS guidelines before running production payroll.
+
+---
+
+## Original Codebase (`main` branch)
+
+The original implementation lives on `main` and uses:
 
 ```
 annex-workforce/
 ├── apps/
-│   ├── api/          NestJS modular monolith (TypeScript + Prisma + PostgreSQL)
-│   └── web/          Next.js 14 frontend (App Router + Tailwind + React Query)
-├── docker-compose.yml    Local infrastructure (postgres, redis, elasticsearch, minio, mailhog)
-├── docs/
-│   └── DEPLOYMENT.md     Full deployment guide
-└── .env.example          All environment variables
+│   ├── api/    NestJS + Prisma + PostgreSQL
+│   └── web/    Next.js 14 (App Router)
+└── docker-compose.yml
 ```
 
-The API is a **modular monolith** with bounded-context modules (auth, candidates, employers, jobs, applications, verification, eor, payroll, hrms). Each module can be extracted into its own service later without rewrites.
+See `docs/DEPLOYMENT.md` on `main` for the original deployment guide.
 
-## Quick start (5 minutes)
-
-Prerequisites: **Docker**, **Node.js 20+**, **npm 10+**.
-
-```bash
-# 1. Copy env file
-cp .env.example .env
-
-# 2. Install + start everything (postgres, redis, ES, minio, mailhog, migrations, seed)
-npm run setup
-
-# 3. Run the apps
-npm run dev
-```
-
-That's it. Open:
-
-- **Frontend** → http://localhost:3000
-- **API docs (Swagger)** → http://localhost:4000/docs
-- **MailHog (dev emails)** → http://localhost:8025
-- **MinIO console** → http://localhost:9001 (`annexminio` / `miniopassword`)
-
-## Demo credentials
-
-The seed script creates three accounts:
-
-| Role        | Email                          | Password     |
-|-------------|--------------------------------|--------------|
-| Super Admin | `admin@annexworkforce.com`     | `Admin@12345` |
-| Candidate   | `candidate@example.com`        | `Pass@1234`   |
-| Employer    | `employer@techstartup.io`      | `Pass@1234`   |
-
-Plus one published EOR job and 16 pre-seeded skills.
-
-## What works today
-
-**For candidates** — register, complete profile (basics, skills, work experience, education, resume upload), browse jobs, apply with cover letter, track application status, initiate identity/credential verification, view payslips, request and track time off.
-
-**For employers** — set up company profile (onboarding flow), post jobs (draft → publish → close), view applicants on a kanban-style pipeline (applied → screening → shortlisted → interview → offer → hired → rejected), drill into individual applications, search verified talent pool with filters, create EOR contracts with cost preview, run monthly payroll with Nigerian PAYE/Pension/NHF computed automatically, approve and disburse runs, approve/reject team leave requests.
-
-**For admins** — review verification queue (approve / reject identity & credential checks), manage users (suspend, deactivate, reactivate), view platform stats.
-
-## Built-in Nigerian compliance
-
-The payroll engine in `apps/api/src/payroll/tax-engine.service.ts` implements:
-
-- **PAYE** with the full Finance Act 2020 graduated bands (7% → 24%)
-- **Consolidated Relief Allowance** (₦200k or 1% of gross + 20% of gross-after-statutory)
-- **Pension** at 8% employee / 10% employer per Pension Reform Act 2014
-- **NHF** at 2.5% of basic salary (when threshold met)
-
-> ⚠️ Tax law evolves. The engine is structurally correct but should be verified against current FIRS guidelines before production payroll runs.
-
-## Architecture
-
-- **`apps/api`** — NestJS 10, Prisma 5, PostgreSQL 16, JWT auth with refresh-token rotation, Redis-backed rate limiting, Elasticsearch for talent + job search (with Postgres fallback), S3-compatible storage (MinIO locally, AWS S3 in prod), Nodemailer for email (MailHog dev / SendGrid prod).
-- **`apps/web`** — Next.js 14 with App Router, route groups for `(auth)` / `(talent)` / `(employer)` / `(admin)`, Zustand for auth state, React Query for server state, Tailwind with a corporate-blue palette and Manrope/Inter typography for a clean SaaS aesthetic.
-
-See [`docs/DEPLOYMENT.md`](./docs/DEPLOYMENT.md) for production deployment.
-
-## Useful commands
-
-```bash
-npm run dev              # Run both apps in watch mode
-npm run build            # Build all workspaces
-npm run infra:up         # Start postgres/redis/es/minio/mailhog
-npm run infra:down       # Stop infrastructure
-npm run db:migrate       # Apply pending migrations
-npm run db:seed          # Seed demo data
-npm run db:studio        # Open Prisma Studio at :5555
-```
+---
 
 ## License
 
