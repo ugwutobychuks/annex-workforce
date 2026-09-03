@@ -13,6 +13,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select.tsx";
 import { BuildingIcon } from "lucide-react";
 import { useEffect } from "react";
+import VerificationPanel from "@/components/verification-panel.tsx";
 
 const schema = z.object({
   name: z.string().min(1, "Company name is required"),
@@ -183,6 +184,8 @@ export default function CompanyProfile() {
           </Form>
         </CardContent>
       </Card>
+
+      <VerificationPanel />
     </div>
   );
 }

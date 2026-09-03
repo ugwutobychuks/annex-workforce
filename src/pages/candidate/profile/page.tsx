@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge.tsx";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form.tsx";
 import { PlusIcon, TrashIcon, BriefcaseIcon, GraduationCapIcon, UserIcon, XIcon } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog.tsx";
+import VerificationPanel from "@/components/verification-panel.tsx";
 
 const profileSchema = z.object({
   headline: z.string().min(1, "Required").max(120),
@@ -376,6 +377,7 @@ export default function CandidateProfile() {
       <BasicInfoForm user={data?.user ?? { _id: "", name: "", email: "" }} profile={data?.profile ?? null} />
       <WorkExperienceSection userId={data?.user._id ?? ""} />
       <EducationSection userId={data?.user._id ?? ""} />
+      <VerificationPanel />
     </div>
   );
 }

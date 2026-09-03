@@ -11,9 +11,7 @@ import {
   LayoutDashboardIcon,
   BriefcaseIcon,
   UsersIcon,
-  FileTextIcon,
   DollarSignIcon,
-  CalendarIcon,
   BuildingIcon,
 } from "lucide-react";
 
@@ -23,9 +21,7 @@ const navItems = [
   { label: "Job Postings", href: "/employer/jobs", icon: BriefcaseIcon },
   { label: "Applicants", href: "/employer/applicants", icon: UsersIcon },
   { label: "Talent Pool", href: "/employer/talent", icon: UsersIcon },
-  { label: "EOR Contracts", href: "/employer/eor", icon: FileTextIcon },
-  { label: "Payroll", href: "/employer/payroll", icon: DollarSignIcon },
-  { label: "Leave Requests", href: "/employer/leave", icon: CalendarIcon },
+  { label: "Payroll & EOR", href: "/employer/payroll", icon: DollarSignIcon },
 ];
 
 function EmployerGuard() {

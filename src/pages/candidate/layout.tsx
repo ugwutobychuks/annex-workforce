@@ -12,9 +12,7 @@ import {
   BriefcaseIcon,
   FileTextIcon,
   UserIcon,
-  CheckSquareIcon,
   DollarSignIcon,
-  CalendarIcon,
 } from "lucide-react";
 
 const navItems = [
@@ -22,9 +20,7 @@ const navItems = [
   { label: "My Profile", href: "/candidate/profile", icon: UserIcon },
   { label: "Browse Jobs", href: "/candidate/jobs", icon: BriefcaseIcon },
   { label: "Applications", href: "/candidate/applications", icon: FileTextIcon },
-  { label: "Verification", href: "/candidate/verification", icon: CheckSquareIcon },
   { label: "Payslips", href: "/candidate/payslips", icon: DollarSignIcon },
-  { label: "Time Off", href: "/candidate/time-off", icon: CalendarIcon },
 ];
 
 function CandidateGuard() {

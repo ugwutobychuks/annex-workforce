@@ -9,6 +9,8 @@ export default defineSchema({
     role: v.optional(v.union(v.literal("candidate"), v.literal("employer"), v.literal("admin"))),
     avatarUrl: v.optional(v.string()),
     onboardingComplete: v.optional(v.boolean()),
+    isBanned: v.optional(v.boolean()),
+    banReason: v.optional(v.string()),
   })
     .index("by_token", ["tokenIdentifier"])
     .index("by_role", ["role"]),
@@ -97,4 +99,73 @@ export default defineSchema({
     .index("by_job", ["jobId"])
     .index("by_candidate", ["candidateId"])
     .index("by_job_and_candidate", ["jobId", "candidateId"]),
+
+  // ── Milestone 4: verification queue ─────────────────────────────────────────
+  verificationRequests: defineTable({
+    subjectUserId: v.id("users"),
+    subjectType: v.union(v.literal("candidate"), v.literal("employer")),
+    status: v.union(v.literal("pending"), v.literal("approved"), v.literal("rejected")),
+    note: v.optional(v.string()),
+    documentUrl: v.optional(v.string()),
+    reviewerId: v.optional(v.id("users")),
+    reviewedAt: v.optional(v.number()),
+    reviewerNote: v.optional(v.string()),
+  })
+    .index("by_status", ["status"])
+    .index("by_subject", ["subjectUserId"]),
+
+  // ── Milestone 5: EOR + payroll ──────────────────────────────────────────────
+  eorContracts: defineTable({
+    employerId: v.id("users"),
+    candidateId: v.id("users"),
+    jobTitle: v.string(),
+    grossMonthlyNGN: v.number(),
+    startDate: v.string(), // YYYY-MM-DD
+    endDate: v.optional(v.string()),
+    pensionRatePct: v.number(), // employee share, typically 8
+    employerPensionRatePct: v.number(), // typically 10
+    nhfEligible: v.boolean(),
+    status: v.union(v.literal("draft"), v.literal("active"), v.literal("terminated")),
+    terminatedAt: v.optional(v.number()),
+    terminationReason: v.optional(v.string()),
+  })
+    .index("by_employer", ["employerId"])
+    .index("by_candidate", ["candidateId"])
+    .index("by_status", ["status"]),
+
+  payrollRuns: defineTable({
+    employerId: v.id("users"),
+    period: v.string(), // YYYY-MM
+    runAt: v.number(),
+    status: v.union(v.literal("draft"), v.literal("finalized")),
+    totalGross: v.number(),
+    totalPaye: v.number(),
+    totalPension: v.number(),
+    totalNhf: v.number(),
+    totalNet: v.number(),
+    totalEmployerPension: v.number(),
+    payslipCount: v.number(),
+  })
+    .index("by_employer", ["employerId"])
+    .index("by_employer_and_period", ["employerId", "period"]),
+
+  payslips: defineTable({
+    runId: v.id("payrollRuns"),
+    contractId: v.id("eorContracts"),
+    employerId: v.id("users"),
+    candidateId: v.id("users"),
+    period: v.string(),
+    gross: v.number(),
+    craMonthly: v.number(),
+    taxableMonthly: v.number(),
+    paye: v.number(),
+    pension: v.number(),
+    nhf: v.number(),
+    net: v.number(),
+    employerPension: v.number(),
+    breakdown: v.string(), // JSON of PAYE bands applied
+  })
+    .index("by_run", ["runId"])
+    .index("by_candidate", ["candidateId"])
+    .index("by_employer_and_period", ["employerId", "period"]),
 });
