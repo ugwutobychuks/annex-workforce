@@ -2,6 +2,7 @@ import { v, ConvexError } from "convex/values";
 import { mutation, query, type MutationCtx } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import type { Id } from "./_generated/dataModel";
+import { notify } from "./notifications";
 
 async function requireEmployerOnApplication(
   ctx: MutationCtx,
@@ -31,7 +32,7 @@ export const schedule = mutation({
     if (args.endAt <= args.scheduledAt)
       throw new ConvexError({ message: "End must be after start", code: "BAD" });
     const { application, job } = await requireEmployerOnApplication(ctx, args.applicationId);
-    return await ctx.db.insert("interviews", {
+    const id = await ctx.db.insert("interviews", {
       applicationId: args.applicationId,
       employerId: job.employerId,
       candidateId: application.candidateId,
@@ -43,6 +44,14 @@ export const schedule = mutation({
       notes: args.notes,
       status: "scheduled",
     });
+    await notify(ctx, {
+      userId: application.candidateId,
+      kind: "interview",
+      title: `Interview scheduled: ${args.title}`,
+      body: `${new Date(args.scheduledAt).toLocaleString()}${args.location ? ` at ${args.location}` : ""}`,
+      link: "/candidate/interviews",
+    });
+    return id;
   },
 });
 

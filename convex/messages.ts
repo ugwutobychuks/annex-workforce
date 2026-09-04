@@ -2,6 +2,7 @@ import { v, ConvexError } from "convex/values";
 import { mutation, query, type MutationCtx, type QueryCtx } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import type { Id } from "./_generated/dataModel";
+import { notify } from "./notifications";
 
 async function requireUser(ctx: QueryCtx | MutationCtx) {
   const userId = await getAuthUserId(ctx);
@@ -66,6 +67,19 @@ export const sendMessage = mutation({
       lastMessagePreview: body.slice(0, 140),
       unreadEmployer: isEmployer ? thread.unreadEmployer : thread.unreadEmployer + 1,
       unreadCandidate: isEmployer ? thread.unreadCandidate + 1 : thread.unreadCandidate,
+    });
+
+    const recipient = isEmployer ? thread.candidateId : thread.employerId;
+    const link = isEmployer
+      ? `/candidate/messages/${args.threadId}`
+      : `/employer/messages/${args.threadId}`;
+    const sender = await ctx.db.get(userId);
+    await notify(ctx, {
+      userId: recipient,
+      kind: "message",
+      title: `New message from ${sender?.name ?? "Someone"}`,
+      body: body.slice(0, 140),
+      link,
     });
   },
 });

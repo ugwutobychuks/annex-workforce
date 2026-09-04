@@ -1,8 +1,9 @@
-import { Menu, BellIcon } from "lucide-react";
+import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button.tsx";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api.js";
 import { Skeleton } from "@/components/ui/skeleton.tsx";
+import NotificationsBell from "@/components/notifications-bell.tsx";
 
 type TopbarProps = {
   title: string;
@@ -21,9 +22,7 @@ export default function Topbar({ title, onMenuClick }: TopbarProps) {
         <h1 className="font-semibold text-base">{title}</h1>
       </div>
       <div className="flex items-center gap-2">
-        <Button variant="ghost" size="icon">
-          <BellIcon className="w-4 h-4" />
-        </Button>
+        <NotificationsBell />
         <div className="flex items-center gap-2">
           {user === undefined ? (
             <Skeleton className="h-7 w-7 rounded-full" />

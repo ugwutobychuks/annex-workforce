@@ -2,6 +2,7 @@ import { v, ConvexError } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { paginationOptsValidator } from "convex/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
+import { notify } from "./notifications";
 
 export const apply = mutation({
   args: {
@@ -24,12 +25,24 @@ export const apply = mutation({
       .unique();
     if (existing) throw new ConvexError({ message: "Already applied", code: "CONFLICT" });
 
-    return await ctx.db.insert("applications", {
+    const applicationId = await ctx.db.insert("applications", {
       jobId: args.jobId,
       candidateId: user._id,
       coverLetter: args.coverLetter,
       status: "applied",
     });
+
+    const job = await ctx.db.get(args.jobId);
+    if (job) {
+      await notify(ctx, {
+        userId: job.employerId,
+        kind: "application_new",
+        title: `New application: ${user.name ?? "A candidate"} for ${job.title}`,
+        body: args.coverLetter?.slice(0, 200),
+        link: `/employer/applicants`,
+      });
+    }
+    return applicationId;
   },
 });
 

@@ -2,6 +2,7 @@ import { v, ConvexError } from "convex/values";
 import { mutation, query, type MutationCtx, type QueryCtx } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import type { Id, Doc } from "./_generated/dataModel";
+import { notify } from "./notifications";
 
 async function requireOwner(ctx: MutationCtx | QueryCtx, assessmentId: Id<"assessments">) {
   const userId = await getAuthUserId(ctx);
@@ -274,6 +275,14 @@ export const submitAttempt = mutation({
       answers: JSON.stringify(graded),
     });
 
+    const taker = await ctx.db.get(userId);
+    await notify(ctx, {
+      userId: a.ownerId,
+      kind: "assessment",
+      title: `${taker?.name ?? "A candidate"} ${passed ? "passed" : "attempted"} "${a.title}"`,
+      body: `Score ${score}% (pass ≥ ${a.passingScore}%)`,
+      link: `/employer/assessments/${a._id}`,
+    });
     return { score, passed };
   },
 });

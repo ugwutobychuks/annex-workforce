@@ -3,6 +3,7 @@ import { mutation, query, type MutationCtx, type QueryCtx } from "./_generated/s
 import { paginationOptsValidator } from "convex/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { computePayslip } from "./lib/payeCalc";
+import { notify } from "./notifications";
 
 async function requireEmployer(ctx: QueryCtx | MutationCtx) {
   const userId = await getAuthUserId(ctx);
@@ -171,6 +172,13 @@ export const runPayroll = mutation({
         pensionRatePct: c.pensionRatePct,
         employerPensionRatePct: c.employerPensionRatePct,
         nhfEligible: c.nhfEligible,
+      });
+      await notify(ctx, {
+        userId: c.candidateId,
+        kind: "payslip",
+        title: `New payslip: ${args.period}`,
+        body: `Net ₦${Math.round(calc.net).toLocaleString()}`,
+        link: "/candidate/payslips",
       });
       await ctx.db.insert("payslips", {
         runId,

@@ -184,6 +184,18 @@ export default defineSchema({
     body: v.string(),
   }).index("by_thread", ["threadId"]),
 
+  // ── M9 notifications ────────────────────────────────────────────────────────
+  notifications: defineTable({
+    userId: v.id("users"),
+    kind: v.string(), // e.g. "application_new", "application_status", "message", "interview", "payslip", "verification", "assessment"
+    title: v.string(),
+    body: v.optional(v.string()),
+    link: v.optional(v.string()),
+    readAt: v.optional(v.number()),
+  })
+    .index("by_user", ["userId"])
+    .index("by_user_unread", ["userId", "readAt"]),
+
   // ── M8 skills assessments ───────────────────────────────────────────────────
   assessments: defineTable({
     ownerId: v.id("users"),

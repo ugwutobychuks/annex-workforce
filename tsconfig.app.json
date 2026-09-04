@@ -26,6 +26,6 @@
       "@/convex/*": ["./convex/*"]
     }
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "dist", "convex"]
+  "include": ["src", "convex"],
+  "exclude": ["node_modules", "dist"]
 }

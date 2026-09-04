@@ -2,6 +2,7 @@ import { v, ConvexError } from "convex/values";
 import { mutation, query, type MutationCtx, type QueryCtx } from "./_generated/server";
 import { paginationOptsValidator } from "convex/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
+import { notify } from "./notifications";
 
 async function requireAdmin(ctx: QueryCtx | MutationCtx) {
   const userId = await getAuthUserId(ctx);
@@ -130,6 +131,14 @@ export const reviewVerification = mutation({
       reviewerId: admin._id,
       reviewedAt: Date.now(),
       reviewerNote: args.reviewerNote,
+    });
+
+    await notify(ctx, {
+      userId: req.subjectUserId,
+      kind: "verification",
+      title: `Verification ${args.decision}`,
+      body: args.reviewerNote,
+      link: req.subjectType === "candidate" ? "/candidate/profile" : "/employer/company",
     });
 
     if (args.decision === "approved") {

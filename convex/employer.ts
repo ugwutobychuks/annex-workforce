@@ -2,6 +2,7 @@ import { v, ConvexError } from "convex/values";
 import { mutation, query, type MutationCtx, type QueryCtx } from "./_generated/server";
 import { paginationOptsValidator } from "convex/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
+import { notify } from "./notifications";
 
 async function getCurrentUser(ctx: QueryCtx | MutationCtx) {
   const userId = await getAuthUserId(ctx);
@@ -175,6 +176,12 @@ export const updateApplicationStatus = mutation({
     if (!job || job.employerId !== user._id)
       throw new ConvexError({ message: "Forbidden", code: "FORBIDDEN" });
     await ctx.db.patch(args.applicationId, { status: args.status });
+    await notify(ctx, {
+      userId: application.candidateId,
+      kind: "application_status",
+      title: `Your application for ${job.title} is now: ${args.status}`,
+      link: "/candidate/applications",
+    });
   },
 });
 
