@@ -36,6 +36,7 @@ import EmployerAssessments from "./pages/employer/assessments/page.tsx";
 import EmployerAssessmentDetail from "./pages/employer/assessments/[id]/page.tsx";
 import CandidateAssessments from "./pages/candidate/assessments/page.tsx";
 import TakeAssessment from "./pages/candidate/assessments/[id]/take/page.tsx";
+import BillingPage from "./pages/employer/billing/page.tsx";
 
 export default function App() {
   return (
@@ -83,6 +84,7 @@ export default function App() {
             <Route path="interviews" element={<InterviewsPage />} />
             <Route path="assessments" element={<EmployerAssessments />} />
             <Route path="assessments/:id" element={<EmployerAssessmentDetail />} />
+            <Route path="billing" element={<BillingPage />} />
             <Route path="settings" element={<SettingsPage />} />
           </Route>
 

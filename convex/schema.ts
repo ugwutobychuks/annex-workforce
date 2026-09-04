@@ -91,6 +91,9 @@ export default defineSchema({
     salary: v.optional(v.string()),
     status: v.union(v.literal("draft"), v.literal("published"), v.literal("closed")),
     skills: v.array(v.string()),
+    // M10: promotion. featuredUntil is a millis timestamp; when > now the job
+    // shows at the top of listings.
+    featuredUntil: v.optional(v.number()),
   })
     .index("by_employer", ["employerId"])
     .index("by_status", ["status"])
@@ -183,6 +186,28 @@ export default defineSchema({
     senderId: v.id("users"),
     body: v.string(),
   }).index("by_thread", ["threadId"]),
+
+  // ── M10 payments ────────────────────────────────────────────────────────────
+  payments: defineTable({
+    userId: v.id("users"),
+    kind: v.string(), // "featured_job" | "eor_disbursement" | ...
+    amount: v.number(), // minor units, e.g. kobo
+    currency: v.string(), // "NGN"
+    provider: v.union(v.literal("stub"), v.literal("paystack"), v.literal("flutterwave")),
+    status: v.union(
+      v.literal("pending"),
+      v.literal("succeeded"),
+      v.literal("failed"),
+      v.literal("refunded")
+    ),
+    reference: v.string(), // internal reference id, also passed to provider
+    providerRef: v.optional(v.string()),
+    checkoutUrl: v.optional(v.string()),
+    // JSON blob for anything else (e.g. related jobId, featured window)
+    metadata: v.optional(v.string()),
+  })
+    .index("by_user", ["userId"])
+    .index("by_reference", ["reference"]),
 
   // ── M9 notifications ────────────────────────────────────────────────────────
   notifications: defineTable({

@@ -1,4 +1,4 @@
-import { usePaginatedQuery, useMutation } from "convex/react";
+import { usePaginatedQuery, useMutation, useAction } from "convex/react";
 import { api } from "@/convex/_generated/api.js";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge.tsx";
 import { Skeleton } from "@/components/ui/skeleton.tsx";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog.tsx";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu.tsx";
-import { PlusIcon, MoreHorizontalIcon, MapPinIcon, DollarSignIcon, EditIcon, TrashIcon, EyeIcon, EyeOffIcon, XCircleIcon } from "lucide-react";
+import { PlusIcon, MoreHorizontalIcon, MapPinIcon, DollarSignIcon, EditIcon, TrashIcon, EyeIcon, EyeOffIcon, XCircleIcon, StarIcon } from "lucide-react";
 import { JobForm, type JobFormValues } from "./_components/job-form.tsx";
 import type { Id } from "@/convex/_generated/dataModel.d.ts";
 import { ConvexError } from "convex/values";
@@ -42,6 +42,7 @@ export default function JobPostings() {
   const updateJob = useMutation(api.employer.updateJob);
   const updateStatus = useMutation(api.employer.updateJobStatus);
   const deleteJob = useMutation(api.employer.deleteJob);
+  const featureCheckout = useAction(api.payments.featureJobCheckout);
 
   const [createOpen, setCreateOpen] = useState(false);
   const [editJob, setEditJob] = useState<Job | null>(null);
@@ -81,6 +82,22 @@ export default function JobPostings() {
       toast.success(`Job ${newStatus === "published" ? "published" : newStatus === "closed" ? "closed" : "moved to draft"}!`);
     } catch {
       toast.error("Failed to update status.");
+    }
+  };
+
+  const handleFeature = async (id: Id<"jobs">) => {
+    try {
+      const res = await featureCheckout({
+        jobId: id,
+        callbackUrl: `${window.location.origin}/employer/billing`,
+      });
+      if (res.autoSucceeded) {
+        toast.success("Featured! (stub payment) — appears at top of listings for 7 days.");
+      } else {
+        window.location.href = res.checkoutUrl;
+      }
+    } catch (err: unknown) {
+      toast.error((err as { data?: { message?: string } }).data?.message ?? "Payment init failed.");
     }
   };
 
@@ -142,6 +159,9 @@ export default function JobPostings() {
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem onClick={() => setEditJob(j)}>
                             <EditIcon className="w-3.5 h-3.5 mr-2" /> Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleFeature(j._id)}>
+                            <StarIcon className="w-3.5 h-3.5 mr-2" /> Feature (₦15,000 / 7 days)
                           </DropdownMenuItem>
                           {j.status !== "published" && (
                             <DropdownMenuItem onClick={() => handleStatusChange(j._id, "published")}>
