@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import Sidebar from "@/components/sidebar.tsx";
 import Topbar from "@/components/topbar.tsx";
 import { Skeleton } from "@/components/ui/skeleton.tsx";
-import { SignInButton } from "@/components/ui/signin.tsx";
+import AuthGuardRedirect from "@/components/auth-guard-redirect.tsx";
 import { LayoutDashboardIcon, UsersIcon, ShieldCheckIcon, BarChartIcon } from "lucide-react";
 
 const navItems = [
@@ -59,12 +59,7 @@ export default function AdminLayout() {
         </div>
       </AuthLoading>
       <Unauthenticated>
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center space-y-4">
-            <p>Admin access only.</p>
-            <SignInButton />
-          </div>
-        </div>
+        <AuthGuardRedirect />
       </Unauthenticated>
       <Authenticated>
         <AdminGuard />

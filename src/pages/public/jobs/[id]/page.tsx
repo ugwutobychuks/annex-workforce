@@ -1,7 +1,8 @@
 import { useQuery, useMutation, useConvexAuth } from "convex/react";
 import { api } from "@/convex/_generated/api.js";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useAuthDialog } from "@/hooks/use-auth-dialog";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -22,7 +23,7 @@ const JOB_TYPE_COLORS = {
 export default function PublicJobDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const location = useLocation();
+  const { open: openAuth } = useAuthDialog();
   const { isAuthenticated, isLoading: authLoading } = useConvexAuth();
 
   const job = useQuery(api.jobs.getById, id ? { id: id as Id<"jobs"> } : "skip");
@@ -59,14 +60,15 @@ export default function PublicJobDetail() {
     );
   }
 
-  const goSignIn = () => {
-    // Return the visitor to this exact page after they sign in / register.
-    const next = encodeURIComponent(location.pathname);
-    navigate(`/login?next=${next}`);
-  };
-
   const openApply = () => {
-    if (!isAuthenticated) return goSignIn();
+    if (!isAuthenticated) {
+      // Modal-first: open sign-in, and re-open the apply dialog once they're in.
+      openAuth({
+        next: window.location.pathname,
+        onSuccess: () => setOpen(true),
+      });
+      return;
+    }
     if (currentUser && currentUser.role !== "candidate") {
       toast.error("Only candidates can apply to jobs. Sign in with a candidate account.");
       return;
@@ -125,7 +127,7 @@ export default function PublicJobDetail() {
             <CheckCircleIcon className="w-5 h-5" /> You've applied to this job
           </div>
         ) : !isAuthenticated ? (
-          <Button size="lg" onClick={goSignIn}>
+          <Button size="lg" onClick={openApply}>
             <LogInIcon className="w-4 h-4 mr-2" /> Sign in to apply
           </Button>
         ) : (

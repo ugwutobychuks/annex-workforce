@@ -2,8 +2,10 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { DefaultProviders } from "./components/providers/default.tsx";
 import AuthCallback from "./pages/auth/Callback.tsx";
 import Login from "./pages/auth/Login.tsx";
-import Index from "./pages/Index.tsx";
+import HomePage from "./pages/home/page.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import AuthDialog from "./components/auth-dialog.tsx";
+import { AuthDialogProvider } from "./hooks/use-auth-dialog.tsx";
 import RoleSelect from "./pages/onboarding/RoleSelect.tsx";
 import CandidateLayout from "./pages/candidate/layout.tsx";
 import CandidateDashboard from "./pages/candidate/dashboard/page.tsx";
@@ -31,8 +33,10 @@ export default function App() {
   return (
     <DefaultProviders>
       <BrowserRouter>
+        <AuthDialogProvider>
+          <AuthDialog />
         <Routes>
-          <Route path="/" element={<Index />} />
+          <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/onboarding/role" element={<RoleSelect />} />
@@ -73,6 +77,7 @@ export default function App() {
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        </AuthDialogProvider>
       </BrowserRouter>
     </DefaultProviders>
   );
