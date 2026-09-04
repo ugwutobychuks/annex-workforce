@@ -184,6 +184,28 @@ export default defineSchema({
     body: v.string(),
   }).index("by_thread", ["threadId"]),
 
+  // ── M7 interviews ───────────────────────────────────────────────────────────
+  interviews: defineTable({
+    applicationId: v.id("applications"),
+    employerId: v.id("users"),
+    candidateId: v.id("users"),
+    title: v.string(),
+    scheduledAt: v.number(),
+    endAt: v.number(),
+    location: v.optional(v.string()),
+    meetingUrl: v.optional(v.string()),
+    notes: v.optional(v.string()),
+    status: v.union(
+      v.literal("scheduled"),
+      v.literal("completed"),
+      v.literal("cancelled"),
+      v.literal("no_show")
+    ),
+  })
+    .index("by_application", ["applicationId"])
+    .index("by_employer", ["employerId"])
+    .index("by_candidate", ["candidateId"]),
+
   payslips: defineTable({
     runId: v.id("payrollRuns"),
     contractId: v.id("eorContracts"),

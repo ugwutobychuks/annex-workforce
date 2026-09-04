@@ -14,6 +14,7 @@ import type * as auth from "../auth.js";
 import type * as candidates from "../candidates.js";
 import type * as employer from "../employer.js";
 import type * as http from "../http.js";
+import type * as interviews from "../interviews.js";
 import type * as jobs from "../jobs.js";
 import type * as lib_payeCalc from "../lib/payeCalc.js";
 import type * as messages from "../messages.js";
@@ -35,6 +36,7 @@ declare const fullApi: ApiFromModules<{
   candidates: typeof candidates;
   employer: typeof employer;
   http: typeof http;
+  interviews: typeof interviews;
   jobs: typeof jobs;
   "lib/payeCalc": typeof lib_payeCalc;
   messages: typeof messages;

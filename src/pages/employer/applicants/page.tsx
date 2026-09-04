@@ -8,10 +8,11 @@ import { Badge } from "@/components/ui/badge.tsx";
 import { Skeleton } from "@/components/ui/skeleton.tsx";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select.tsx";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog.tsx";
-import { UserIcon, BriefcaseIcon, MessageSquareIcon } from "lucide-react";
+import { UserIcon, BriefcaseIcon, MessageSquareIcon, CalendarIcon } from "lucide-react";
 import type { Id } from "@/convex/_generated/dataModel.d.ts";
 import { cn } from "@/lib/utils.ts";
 import { useNavigate } from "react-router-dom";
+import { ScheduleInterviewDialog } from "@/components/schedule-interview-dialog.tsx";
 
 const PIPELINE_STAGES = [
   { key: "applied",     label: "Applied",     color: "bg-blue-500" },
@@ -142,6 +143,8 @@ export default function ApplicantsPage() {
   const updateStatus = useMutation(api.employer.updateApplicationStatus);
   const openThread = useMutation(api.messages.getOrCreateThread);
   const navigate = useNavigate();
+
+  const [scheduleForApp, setScheduleForApp] = useState<Id<"applications"> | null>(null);
 
   const messageCandidate = async (applicationId: Id<"applications">) => {
     try {
@@ -291,18 +294,35 @@ export default function ApplicantsPage() {
                 <p className="text-xs text-muted-foreground">
                   Applied {new Date(selectedApp._creationTime).toLocaleDateString()}
                 </p>
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  onClick={() => messageCandidate(selectedApp._id)}
-                >
-                  <MessageSquareIcon className="w-3.5 h-3.5 mr-1" /> Message candidate
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => setScheduleForApp(selectedApp._id)}
+                  >
+                    <CalendarIcon className="w-3.5 h-3.5 mr-1" /> Schedule interview
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => messageCandidate(selectedApp._id)}
+                  >
+                    <MessageSquareIcon className="w-3.5 h-3.5 mr-1" /> Message candidate
+                  </Button>
+                </div>
               </div>
             </div>
           )}
         </DialogContent>
       </Dialog>
+
+      {scheduleForApp && (
+        <ScheduleInterviewDialog
+          applicationId={scheduleForApp}
+          open={!!scheduleForApp}
+          onClose={() => setScheduleForApp(null)}
+        />
+      )}
     </div>
   );
 }

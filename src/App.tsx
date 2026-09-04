@@ -31,6 +31,7 @@ import AdminAnalytics from "./pages/admin/analytics/page.tsx";
 import SettingsPage from "./pages/settings/page.tsx";
 import MessagesInbox from "./pages/messages/page.tsx";
 import ThreadView from "./pages/messages/[id]/page.tsx";
+import InterviewsPage from "./pages/interviews/page.tsx";
 
 export default function App() {
   return (
@@ -58,6 +59,7 @@ export default function App() {
             <Route path="payslips" element={<MyPayslips />} />
             <Route path="messages" element={<MessagesInbox />} />
             <Route path="messages/:id" element={<ThreadView />} />
+            <Route path="interviews" element={<InterviewsPage />} />
             <Route path="settings" element={<SettingsPage />} />
           </Route>
 
@@ -72,6 +74,7 @@ export default function App() {
             <Route path="payroll/runs/:id" element={<PayrollRunDetail />} />
             <Route path="messages" element={<MessagesInbox />} />
             <Route path="messages/:id" element={<ThreadView />} />
+            <Route path="interviews" element={<InterviewsPage />} />
             <Route path="settings" element={<SettingsPage />} />
           </Route>
 
