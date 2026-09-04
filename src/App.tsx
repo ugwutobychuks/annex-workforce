@@ -29,6 +29,8 @@ import AdminUsers from "./pages/admin/users/page.tsx";
 import AdminVerification from "./pages/admin/verification/page.tsx";
 import AdminAnalytics from "./pages/admin/analytics/page.tsx";
 import SettingsPage from "./pages/settings/page.tsx";
+import MessagesInbox from "./pages/messages/page.tsx";
+import ThreadView from "./pages/messages/[id]/page.tsx";
 
 export default function App() {
   return (
@@ -54,6 +56,8 @@ export default function App() {
             <Route path="profile" element={<CandidateProfile />} />
             <Route path="applications" element={<MyApplications />} />
             <Route path="payslips" element={<MyPayslips />} />
+            <Route path="messages" element={<MessagesInbox />} />
+            <Route path="messages/:id" element={<ThreadView />} />
             <Route path="settings" element={<SettingsPage />} />
           </Route>
 
@@ -66,6 +70,8 @@ export default function App() {
             <Route path="talent" element={<TalentPool />} />
             <Route path="payroll" element={<PayrollPage />} />
             <Route path="payroll/runs/:id" element={<PayrollRunDetail />} />
+            <Route path="messages" element={<MessagesInbox />} />
+            <Route path="messages/:id" element={<ThreadView />} />
             <Route path="settings" element={<SettingsPage />} />
           </Route>
 

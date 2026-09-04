@@ -13,6 +13,7 @@ import {
   FileTextIcon,
   UserIcon,
   DollarSignIcon,
+  MessageSquareIcon,
 } from "lucide-react";
 
 const navItems = [
@@ -20,6 +21,7 @@ const navItems = [
   { label: "My Profile", href: "/candidate/profile", icon: UserIcon },
   { label: "Browse Jobs", href: "/jobs", icon: BriefcaseIcon },
   { label: "Applications", href: "/candidate/applications", icon: FileTextIcon },
+  { label: "Messages", href: "/candidate/messages", icon: MessageSquareIcon },
   { label: "Payslips", href: "/candidate/payslips", icon: DollarSignIcon },
 ];
 

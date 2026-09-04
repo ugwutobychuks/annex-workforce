@@ -1,10 +1,11 @@
-import { usePaginatedQuery } from "convex/react";
+import { usePaginatedQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api.js";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { Skeleton } from "@/components/ui/skeleton.tsx";
-import { FileTextIcon, MapPinIcon, CalendarIcon } from "lucide-react";
+import { FileTextIcon, MapPinIcon, CalendarIcon, MessageSquareIcon } from "lucide-react";
 import type { Id } from "@/convex/_generated/dataModel.d.ts";
 
 const STATUS_STYLES = {
@@ -21,11 +22,21 @@ type AppStatus = keyof typeof STATUS_STYLES;
 
 export default function MyApplications() {
   const navigate = useNavigate();
+  const openThread = useMutation(api.messages.getOrCreateThread);
   const { results, status, loadMore } = usePaginatedQuery(
     api.applications.getMyApplications,
     {},
     { initialNumItems: 20 }
   );
+
+  const messageEmployer = async (applicationId: Id<"applications">) => {
+    try {
+      const threadId = await openThread({ applicationId });
+      navigate(`/candidate/messages/${threadId}`);
+    } catch {
+      toast.error("Couldn't open the conversation.");
+    }
+  };
 
   if (status === "LoadingFirstPage") {
     return (
@@ -74,14 +85,23 @@ export default function MyApplications() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
-                    {app.job?.location && (
-                      <span className="flex items-center gap-1"><MapPinIcon className="w-3 h-3" />{app.job.location}</span>
-                    )}
-                    <span className="flex items-center gap-1">
-                      <CalendarIcon className="w-3 h-3" />
-                      Applied {new Date(app._creationTime).toLocaleDateString()}
-                    </span>
+                  <div className="flex items-center justify-between gap-3 flex-wrap">
+                    <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
+                      {app.job?.location && (
+                        <span className="flex items-center gap-1"><MapPinIcon className="w-3 h-3" />{app.job.location}</span>
+                      )}
+                      <span className="flex items-center gap-1">
+                        <CalendarIcon className="w-3 h-3" />
+                        Applied {new Date(app._creationTime).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={(e) => { e.stopPropagation(); messageEmployer(app._id); }}
+                    >
+                      <MessageSquareIcon className="w-3.5 h-3.5 mr-1" /> Message
+                    </Button>
                   </div>
                 </CardContent>
               </Card>

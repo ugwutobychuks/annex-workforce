@@ -16,6 +16,7 @@ import type * as employer from "../employer.js";
 import type * as http from "../http.js";
 import type * as jobs from "../jobs.js";
 import type * as lib_payeCalc from "../lib/payeCalc.js";
+import type * as messages from "../messages.js";
 import type * as payroll from "../payroll.js";
 import type * as seed from "../seed.js";
 import type * as users from "../users.js";
@@ -36,6 +37,7 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   jobs: typeof jobs;
   "lib/payeCalc": typeof lib_payeCalc;
+  messages: typeof messages;
   payroll: typeof payroll;
   seed: typeof seed;
   users: typeof users;

@@ -13,6 +13,7 @@ import {
   UsersIcon,
   DollarSignIcon,
   BuildingIcon,
+  MessageSquareIcon,
 } from "lucide-react";
 
 const navItems = [
@@ -20,6 +21,7 @@ const navItems = [
   { label: "Company Profile", href: "/employer/company", icon: BuildingIcon },
   { label: "Job Postings", href: "/employer/jobs", icon: BriefcaseIcon },
   { label: "Applicants", href: "/employer/applicants", icon: UsersIcon },
+  { label: "Messages", href: "/employer/messages", icon: MessageSquareIcon },
   { label: "Talent Pool", href: "/employer/talent", icon: UsersIcon },
   { label: "Payroll & EOR", href: "/employer/payroll", icon: DollarSignIcon },
 ];

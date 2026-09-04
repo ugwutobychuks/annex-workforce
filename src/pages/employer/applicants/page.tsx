@@ -8,9 +8,10 @@ import { Badge } from "@/components/ui/badge.tsx";
 import { Skeleton } from "@/components/ui/skeleton.tsx";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select.tsx";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog.tsx";
-import { UserIcon, BriefcaseIcon } from "lucide-react";
+import { UserIcon, BriefcaseIcon, MessageSquareIcon } from "lucide-react";
 import type { Id } from "@/convex/_generated/dataModel.d.ts";
 import { cn } from "@/lib/utils.ts";
+import { useNavigate } from "react-router-dom";
 
 const PIPELINE_STAGES = [
   { key: "applied",     label: "Applied",     color: "bg-blue-500" },
@@ -139,6 +140,17 @@ export default function ApplicantsPage() {
   );
 
   const updateStatus = useMutation(api.employer.updateApplicationStatus);
+  const openThread = useMutation(api.messages.getOrCreateThread);
+  const navigate = useNavigate();
+
+  const messageCandidate = async (applicationId: Id<"applications">) => {
+    try {
+      const threadId = await openThread({ applicationId });
+      navigate(`/employer/messages/${threadId}`);
+    } catch {
+      toast.error("Couldn't open the conversation.");
+    }
+  };
 
   const handleStatusChange = async (id: Id<"applications">, status: Stage) => {
     try {
@@ -275,9 +287,18 @@ export default function ApplicantsPage() {
                 </Select>
               </div>
 
-              <p className="text-xs text-muted-foreground">
-                Applied {new Date(selectedApp._creationTime).toLocaleDateString()}
-              </p>
+              <div className="flex items-center justify-between gap-3 flex-wrap">
+                <p className="text-xs text-muted-foreground">
+                  Applied {new Date(selectedApp._creationTime).toLocaleDateString()}
+                </p>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => messageCandidate(selectedApp._id)}
+                >
+                  <MessageSquareIcon className="w-3.5 h-3.5 mr-1" /> Message candidate
+                </Button>
+              </div>
             </div>
           )}
         </DialogContent>

@@ -164,6 +164,26 @@ export default defineSchema({
     .index("by_employer", ["employerId"])
     .index("by_employer_and_period", ["employerId", "period"]),
 
+  // ── M6 messaging ────────────────────────────────────────────────────────────
+  messageThreads: defineTable({
+    applicationId: v.id("applications"),
+    employerId: v.id("users"),
+    candidateId: v.id("users"),
+    lastMessageAt: v.number(),
+    lastMessagePreview: v.optional(v.string()),
+    unreadEmployer: v.number(),
+    unreadCandidate: v.number(),
+  })
+    .index("by_application", ["applicationId"])
+    .index("by_employer", ["employerId"])
+    .index("by_candidate", ["candidateId"]),
+
+  messages: defineTable({
+    threadId: v.id("messageThreads"),
+    senderId: v.id("users"),
+    body: v.string(),
+  }).index("by_thread", ["threadId"]),
+
   payslips: defineTable({
     runId: v.id("payrollRuns"),
     contractId: v.id("eorContracts"),
