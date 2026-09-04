@@ -10,6 +10,7 @@
 
 import type * as admin from "../admin.js";
 import type * as applications from "../applications.js";
+import type * as assessments from "../assessments.js";
 import type * as auth from "../auth.js";
 import type * as candidates from "../candidates.js";
 import type * as employer from "../employer.js";
@@ -32,6 +33,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   admin: typeof admin;
   applications: typeof applications;
+  assessments: typeof assessments;
   auth: typeof auth;
   candidates: typeof candidates;
   employer: typeof employer;

@@ -184,6 +184,41 @@ export default defineSchema({
     body: v.string(),
   }).index("by_thread", ["threadId"]),
 
+  // ── M8 skills assessments ───────────────────────────────────────────────────
+  assessments: defineTable({
+    ownerId: v.id("users"),
+    title: v.string(),
+    description: v.optional(v.string()),
+    skill: v.string(),
+    passingScore: v.number(), // 0..100
+    timeLimitMinutes: v.optional(v.number()),
+    status: v.union(v.literal("draft"), v.literal("published"), v.literal("archived")),
+  })
+    .index("by_owner", ["ownerId"])
+    .index("by_status", ["status"]),
+
+  assessmentQuestions: defineTable({
+    assessmentId: v.id("assessments"),
+    order: v.number(),
+    prompt: v.string(),
+    options: v.array(v.string()),
+    correctIndex: v.number(),
+  }).index("by_assessment", ["assessmentId"]),
+
+  assessmentAttempts: defineTable({
+    assessmentId: v.id("assessments"),
+    candidateId: v.id("users"),
+    startedAt: v.number(),
+    submittedAt: v.optional(v.number()),
+    score: v.optional(v.number()),
+    passed: v.optional(v.boolean()),
+    // answers: JSON array of {questionId, selectedIndex, correct}
+    answers: v.optional(v.string()),
+  })
+    .index("by_assessment", ["assessmentId"])
+    .index("by_candidate", ["candidateId"])
+    .index("by_assessment_and_candidate", ["assessmentId", "candidateId"]),
+
   // ── M7 interviews ───────────────────────────────────────────────────────────
   interviews: defineTable({
     applicationId: v.id("applications"),

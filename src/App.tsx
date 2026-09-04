@@ -32,6 +32,10 @@ import SettingsPage from "./pages/settings/page.tsx";
 import MessagesInbox from "./pages/messages/page.tsx";
 import ThreadView from "./pages/messages/[id]/page.tsx";
 import InterviewsPage from "./pages/interviews/page.tsx";
+import EmployerAssessments from "./pages/employer/assessments/page.tsx";
+import EmployerAssessmentDetail from "./pages/employer/assessments/[id]/page.tsx";
+import CandidateAssessments from "./pages/candidate/assessments/page.tsx";
+import TakeAssessment from "./pages/candidate/assessments/[id]/take/page.tsx";
 
 export default function App() {
   return (
@@ -60,6 +64,8 @@ export default function App() {
             <Route path="messages" element={<MessagesInbox />} />
             <Route path="messages/:id" element={<ThreadView />} />
             <Route path="interviews" element={<InterviewsPage />} />
+            <Route path="assessments" element={<CandidateAssessments />} />
+            <Route path="assessments/:id/take" element={<TakeAssessment />} />
             <Route path="settings" element={<SettingsPage />} />
           </Route>
 
@@ -75,6 +81,8 @@ export default function App() {
             <Route path="messages" element={<MessagesInbox />} />
             <Route path="messages/:id" element={<ThreadView />} />
             <Route path="interviews" element={<InterviewsPage />} />
+            <Route path="assessments" element={<EmployerAssessments />} />
+            <Route path="assessments/:id" element={<EmployerAssessmentDetail />} />
             <Route path="settings" element={<SettingsPage />} />
           </Route>
 
