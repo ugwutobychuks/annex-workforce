@@ -128,6 +128,25 @@ export const demoJobs = mutation({
  * Pass `alsoReseed: true` to do both in one call:
  *   npx convex run seed:resetDemo '{"alsoReseed": true}'
  */
+/**
+ * Promote an existing account to admin by email. Register that email first
+ * from /login, then run:
+ *   npx convex run seed:promoteToAdmin '{"email":"you@example.com"}'
+ * (in PowerShell use --%  {"email":"..."} — see the README notes for quoting).
+ */
+export const promoteToAdmin = mutation({
+  args: { email: v.string() },
+  handler: async (ctx, args) => {
+    const u = await ctx.db
+      .query("users")
+      .withIndex("email", (q) => q.eq("email", args.email))
+      .unique();
+    if (!u) return { ok: false, reason: `No user with email ${args.email}` };
+    await ctx.db.patch(u._id, { role: "admin", onboardingComplete: true });
+    return { ok: true, userId: u._id };
+  },
+});
+
 export const resetDemo = mutation({
   args: { alsoReseed: v.optional(v.boolean()) },
   handler: async (ctx, args) => {
