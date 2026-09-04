@@ -17,6 +17,7 @@ import {
   CalendarIcon,
   ClipboardCheckIcon,
   FileSignatureIcon,
+  UsersIcon,
 } from "lucide-react";
 
 const navItems = [
@@ -28,6 +29,7 @@ const navItems = [
   { label: "Interviews", href: "/candidate/interviews", icon: CalendarIcon },
   { label: "Assessments", href: "/candidate/assessments", icon: ClipboardCheckIcon },
   { label: "Signatures", href: "/candidate/signatures", icon: FileSignatureIcon },
+  { label: "HR", href: "/candidate/hrms", icon: UsersIcon },
   { label: "Payslips", href: "/candidate/payslips", icon: DollarSignIcon },
 ];
 

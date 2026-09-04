@@ -187,6 +187,63 @@ export default defineSchema({
     body: v.string(),
   }).index("by_thread", ["threadId"]),
 
+  // ── M12 HRMS ────────────────────────────────────────────────────────────────
+  leaveRequests: defineTable({
+    userId: v.id("users"),
+    employerId: v.id("users"),
+    kind: v.union(
+      v.literal("annual"),
+      v.literal("sick"),
+      v.literal("maternity"),
+      v.literal("paternity"),
+      v.literal("unpaid"),
+      v.literal("other")
+    ),
+    startDate: v.string(), // YYYY-MM-DD
+    endDate: v.string(),
+    days: v.number(),
+    reason: v.optional(v.string()),
+    status: v.union(
+      v.literal("pending"),
+      v.literal("approved"),
+      v.literal("rejected"),
+      v.literal("cancelled")
+    ),
+    reviewerId: v.optional(v.id("users")),
+    reviewedAt: v.optional(v.number()),
+    reviewerNote: v.optional(v.string()),
+  })
+    .index("by_user", ["userId"])
+    .index("by_employer", ["employerId"])
+    .index("by_employer_and_status", ["employerId", "status"]),
+
+  attendance: defineTable({
+    userId: v.id("users"),
+    employerId: v.id("users"),
+    checkedInAt: v.number(),
+    checkedOutAt: v.optional(v.number()),
+    notes: v.optional(v.string()),
+  })
+    .index("by_user", ["userId"])
+    .index("by_employer_and_day", ["employerId", "checkedInAt"]),
+
+  orgNodes: defineTable({
+    employerId: v.id("users"),
+    userId: v.optional(v.id("users")),
+    title: v.string(), // role title
+    department: v.optional(v.string()),
+    managerId: v.optional(v.id("orgNodes")),
+  }).index("by_employer", ["employerId"]),
+
+  hrmsDocuments: defineTable({
+    employerId: v.id("users"),
+    uploaderId: v.id("users"),
+    title: v.string(),
+    kind: v.string(), // "handbook" | "policy" | "template" | "other"
+    url: v.string(),
+    visibility: v.union(v.literal("employer"), v.literal("workers"), v.literal("both")),
+  }).index("by_employer", ["employerId"]),
+
   // ── M11 e-signature ─────────────────────────────────────────────────────────
   signatureDocuments: defineTable({
     ownerId: v.id("users"),

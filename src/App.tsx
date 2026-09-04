@@ -40,6 +40,8 @@ import BillingPage from "./pages/employer/billing/page.tsx";
 import SignaturesInbox from "./pages/signatures/page.tsx";
 import SignatureDetail from "./pages/signatures/[id]/page.tsx";
 import NewSignatureDocument from "./pages/employer/signatures/new/page.tsx";
+import CandidateHrms from "./pages/candidate/hrms/page.tsx";
+import EmployerHrms from "./pages/employer/hrms/page.tsx";
 
 export default function App() {
   return (
@@ -72,6 +74,7 @@ export default function App() {
             <Route path="assessments/:id/take" element={<TakeAssessment />} />
             <Route path="signatures" element={<SignaturesInbox />} />
             <Route path="signatures/:id" element={<SignatureDetail />} />
+            <Route path="hrms" element={<CandidateHrms />} />
             <Route path="settings" element={<SettingsPage />} />
           </Route>
 
@@ -93,6 +96,7 @@ export default function App() {
             <Route path="signatures" element={<SignaturesInbox />} />
             <Route path="signatures/new" element={<NewSignatureDocument />} />
             <Route path="signatures/:id" element={<SignatureDetail />} />
+            <Route path="hrms" element={<EmployerHrms />} />
             <Route path="settings" element={<SettingsPage />} />
           </Route>
 

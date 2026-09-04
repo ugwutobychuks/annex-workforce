@@ -14,6 +14,7 @@ import type * as assessments from "../assessments.js";
 import type * as auth from "../auth.js";
 import type * as candidates from "../candidates.js";
 import type * as employer from "../employer.js";
+import type * as hrms from "../hrms.js";
 import type * as http from "../http.js";
 import type * as interviews from "../interviews.js";
 import type * as jobs from "../jobs.js";
@@ -42,6 +43,7 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   candidates: typeof candidates;
   employer: typeof employer;
+  hrms: typeof hrms;
   http: typeof http;
   interviews: typeof interviews;
   jobs: typeof jobs;
