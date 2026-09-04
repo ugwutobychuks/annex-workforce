@@ -2,13 +2,16 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useState } from "react";
+import { useAction } from "convex/react";
+import { api } from "@/convex/_generated/api.js";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import { Textarea } from "@/components/ui/textarea.tsx";
 import { Badge } from "@/components/ui/badge.tsx";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form.tsx";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select.tsx";
-import { XIcon } from "lucide-react";
+import { XIcon, SparklesIcon } from "lucide-react";
 
 const schema = z.object({
   title: z.string().min(1, "Required"),
@@ -32,6 +35,32 @@ type Props = {
 export function JobForm({ onSubmit, submitting, defaultValues }: Props) {
   const [skills, setSkills] = useState<string[]>(defaultValues?.skills ?? []);
   const [skillInput, setSkillInput] = useState("");
+  const writeJd = useAction(api.ai.writeJobDescription);
+  const [aiBusy, setAiBusy] = useState(false);
+
+  const generateWithAi = async () => {
+    const values = form.getValues();
+    if (!values.title || !values.location || !values.type) {
+      toast.error("Fill title, location, and type first — the AI uses them.");
+      return;
+    }
+    setAiBusy(true);
+    try {
+      const out = await writeJd({
+        title: values.title,
+        skills,
+        location: values.location,
+        type: values.type,
+        salary: values.salary || undefined,
+        company: values.company || undefined,
+      });
+      form.setValue("description", out.description);
+      form.setValue("requirements", out.requirements);
+      toast.success("Draft filled — edit anything you don't like.");
+    } catch (err: unknown) {
+      toast.error((err as { data?: { message?: string } }).data?.message ?? "AI generation failed.");
+    } finally { setAiBusy(false); }
+  };
 
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
@@ -129,6 +158,13 @@ export function JobForm({ onSubmit, submitting, defaultValues }: Props) {
               <FormMessage />
             </FormItem>
           )} />
+        </div>
+
+        <div className="flex items-center justify-between">
+          <FormLabel>Description & requirements</FormLabel>
+          <Button type="button" size="sm" variant="secondary" disabled={aiBusy} onClick={generateWithAi}>
+            <SparklesIcon className="w-3.5 h-3.5 mr-1" /> {aiBusy ? "Generating…" : "AI draft"}
+          </Button>
         </div>
 
         <FormField control={form.control} name="description" render={({ field }) => (

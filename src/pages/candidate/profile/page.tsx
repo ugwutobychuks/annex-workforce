@@ -12,8 +12,9 @@ import { Textarea } from "@/components/ui/textarea.tsx";
 import { Skeleton } from "@/components/ui/skeleton.tsx";
 import { Badge } from "@/components/ui/badge.tsx";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form.tsx";
-import { PlusIcon, TrashIcon, BriefcaseIcon, GraduationCapIcon, UserIcon, XIcon } from "lucide-react";
+import { PlusIcon, TrashIcon, BriefcaseIcon, GraduationCapIcon, UserIcon, XIcon, SparklesIcon } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog.tsx";
+import { ParseResumeDialog } from "@/components/parse-resume-dialog.tsx";
 import VerificationPanel from "@/components/verification-panel.tsx";
 
 const profileSchema = z.object({
@@ -357,6 +358,7 @@ function EducationSection({ userId }: { userId: string }) {
 
 export default function CandidateProfile() {
   const data = useQuery(api.candidates.getMyProfile);
+  const [parseOpen, setParseOpen] = useState(false);
 
   if (data === undefined) {
     return (
@@ -369,15 +371,26 @@ export default function CandidateProfile() {
 
   return (
     <div className="space-y-6 max-w-3xl">
-      <div>
-        <h2 className="text-2xl font-bold">My Profile</h2>
-        <p className="text-muted-foreground mt-1">Keep your profile up to date to get discovered by employers.</p>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h2 className="text-2xl font-bold">My Profile</h2>
+          <p className="text-muted-foreground mt-1">Keep your profile up to date to get discovered by employers.</p>
+        </div>
+        <Button variant="secondary" onClick={() => setParseOpen(true)}>
+          <SparklesIcon className="w-4 h-4 mr-2" /> Parse from resume text
+        </Button>
       </div>
 
       <BasicInfoForm user={data?.user ?? { _id: "", name: "", email: "" }} profile={data?.profile ?? null} />
       <WorkExperienceSection userId={data?.user._id ?? ""} />
       <EducationSection userId={data?.user._id ?? ""} />
       <VerificationPanel />
+
+      <ParseResumeDialog
+        open={parseOpen}
+        onClose={() => setParseOpen(false)}
+        currentSkills={data?.profile?.skills ?? []}
+      />
     </div>
   );
 }

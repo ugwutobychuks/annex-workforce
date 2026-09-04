@@ -9,6 +9,7 @@
  */
 
 import type * as admin from "../admin.js";
+import type * as ai from "../ai.js";
 import type * as applications from "../applications.js";
 import type * as assessments from "../assessments.js";
 import type * as auth from "../auth.js";
@@ -18,6 +19,7 @@ import type * as hrms from "../hrms.js";
 import type * as http from "../http.js";
 import type * as interviews from "../interviews.js";
 import type * as jobs from "../jobs.js";
+import type * as lib_ai from "../lib/ai.js";
 import type * as lib_hash from "../lib/hash.js";
 import type * as lib_payeCalc from "../lib/payeCalc.js";
 import type * as lib_payments from "../lib/payments.js";
@@ -39,6 +41,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   admin: typeof admin;
+  ai: typeof ai;
   applications: typeof applications;
   assessments: typeof assessments;
   auth: typeof auth;
@@ -48,6 +51,7 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   interviews: typeof interviews;
   jobs: typeof jobs;
+  "lib/ai": typeof lib_ai;
   "lib/hash": typeof lib_hash;
   "lib/payeCalc": typeof lib_payeCalc;
   "lib/payments": typeof lib_payments;

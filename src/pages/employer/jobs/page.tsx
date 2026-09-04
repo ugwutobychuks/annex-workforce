@@ -8,7 +8,8 @@ import { Badge } from "@/components/ui/badge.tsx";
 import { Skeleton } from "@/components/ui/skeleton.tsx";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog.tsx";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu.tsx";
-import { PlusIcon, MoreHorizontalIcon, MapPinIcon, DollarSignIcon, EditIcon, TrashIcon, EyeIcon, EyeOffIcon, XCircleIcon, StarIcon } from "lucide-react";
+import { PlusIcon, MoreHorizontalIcon, MapPinIcon, DollarSignIcon, EditIcon, TrashIcon, EyeIcon, EyeOffIcon, XCircleIcon, StarIcon, SparklesIcon } from "lucide-react";
+import { AiMatchDialog } from "@/components/ai-match-dialog.tsx";
 import { JobForm, type JobFormValues } from "./_components/job-form.tsx";
 import type { Id } from "@/convex/_generated/dataModel.d.ts";
 import { ConvexError } from "convex/values";
@@ -46,6 +47,7 @@ export default function JobPostings() {
 
   const [createOpen, setCreateOpen] = useState(false);
   const [editJob, setEditJob] = useState<Job | null>(null);
+  const [matchJob, setMatchJob] = useState<Job | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   const handleCreate = async (data: JobFormValues) => {
@@ -163,6 +165,9 @@ export default function JobPostings() {
                           <DropdownMenuItem onClick={() => handleFeature(j._id)}>
                             <StarIcon className="w-3.5 h-3.5 mr-2" /> Feature (₦15,000 / 7 days)
                           </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => setMatchJob(j)}>
+                            <SparklesIcon className="w-3.5 h-3.5 mr-2" /> AI match candidates
+                          </DropdownMenuItem>
                           {j.status !== "published" && (
                             <DropdownMenuItem onClick={() => handleStatusChange(j._id, "published")}>
                               <EyeIcon className="w-3.5 h-3.5 mr-2" /> Publish
@@ -218,6 +223,15 @@ export default function JobPostings() {
           <JobForm onSubmit={handleCreate} submitting={submitting} />
         </DialogContent>
       </Dialog>
+
+      {matchJob && (
+        <AiMatchDialog
+          jobId={matchJob._id}
+          jobTitle={matchJob.title}
+          open={!!matchJob}
+          onClose={() => setMatchJob(null)}
+        />
+      )}
 
       {/* Edit dialog */}
       <Dialog open={!!editJob} onOpenChange={(o) => { if (!o) setEditJob(null); }}>
