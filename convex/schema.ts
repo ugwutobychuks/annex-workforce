@@ -187,6 +187,29 @@ export default defineSchema({
     body: v.string(),
   }).index("by_thread", ["threadId"]),
 
+  // ── M11 e-signature ─────────────────────────────────────────────────────────
+  signatureDocuments: defineTable({
+    ownerId: v.id("users"),
+    targetUserId: v.id("users"),
+    title: v.string(),
+    kind: v.union(v.literal("offer_letter"), v.literal("eor_contract"), v.literal("custom")),
+    content: v.string(),
+    contentHash: v.string(), // sha-256 of content, hex
+    status: v.union(
+      v.literal("draft"),
+      v.literal("sent"),
+      v.literal("signed"),
+      v.literal("declined")
+    ),
+    sentAt: v.optional(v.number()),
+    signedAt: v.optional(v.number()),
+    signatureText: v.optional(v.string()),
+    signatureHash: v.optional(v.string()), // sha-256 of `${contentHash}|${signatureText}|${signerId}|${signedAt}`
+    declineReason: v.optional(v.string()),
+  })
+    .index("by_owner", ["ownerId"])
+    .index("by_target", ["targetUserId"]),
+
   // ── M10 payments ────────────────────────────────────────────────────────────
   payments: defineTable({
     userId: v.id("users"),

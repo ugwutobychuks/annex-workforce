@@ -17,6 +17,7 @@ import type * as employer from "../employer.js";
 import type * as http from "../http.js";
 import type * as interviews from "../interviews.js";
 import type * as jobs from "../jobs.js";
+import type * as lib_hash from "../lib/hash.js";
 import type * as lib_payeCalc from "../lib/payeCalc.js";
 import type * as lib_payments from "../lib/payments.js";
 import type * as messages from "../messages.js";
@@ -24,6 +25,7 @@ import type * as notifications from "../notifications.js";
 import type * as payments from "../payments.js";
 import type * as payroll from "../payroll.js";
 import type * as seed from "../seed.js";
+import type * as signatures from "../signatures.js";
 import type * as users from "../users.js";
 import type * as verification from "../verification.js";
 
@@ -43,6 +45,7 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   interviews: typeof interviews;
   jobs: typeof jobs;
+  "lib/hash": typeof lib_hash;
   "lib/payeCalc": typeof lib_payeCalc;
   "lib/payments": typeof lib_payments;
   messages: typeof messages;
@@ -50,6 +53,7 @@ declare const fullApi: ApiFromModules<{
   payments: typeof payments;
   payroll: typeof payroll;
   seed: typeof seed;
+  signatures: typeof signatures;
   users: typeof users;
   verification: typeof verification;
 }>;
