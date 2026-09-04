@@ -2,6 +2,18 @@ import { v, ConvexError } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 
+export const updateMyName = mutation({
+  args: { name: v.string() },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new ConvexError({ message: "Not authenticated", code: "UNAUTHENTICATED" });
+    const trimmed = args.name.trim();
+    if (trimmed.length === 0)
+      throw new ConvexError({ message: "Name cannot be empty", code: "BAD" });
+    await ctx.db.patch(userId, { name: trimmed });
+  },
+});
+
 export const getCurrentUser = query({
   args: {},
   handler: async (ctx) => {

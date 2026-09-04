@@ -28,6 +28,7 @@ import AdminDashboard from "./pages/admin/dashboard/page.tsx";
 import AdminUsers from "./pages/admin/users/page.tsx";
 import AdminVerification from "./pages/admin/verification/page.tsx";
 import AdminAnalytics from "./pages/admin/analytics/page.tsx";
+import SettingsPage from "./pages/settings/page.tsx";
 
 export default function App() {
   return (
@@ -53,6 +54,7 @@ export default function App() {
             <Route path="profile" element={<CandidateProfile />} />
             <Route path="applications" element={<MyApplications />} />
             <Route path="payslips" element={<MyPayslips />} />
+            <Route path="settings" element={<SettingsPage />} />
           </Route>
 
           {/* Employer routes */}
@@ -64,6 +66,7 @@ export default function App() {
             <Route path="talent" element={<TalentPool />} />
             <Route path="payroll" element={<PayrollPage />} />
             <Route path="payroll/runs/:id" element={<PayrollRunDetail />} />
+            <Route path="settings" element={<SettingsPage />} />
           </Route>
 
           {/* Admin routes */}
@@ -72,6 +75,7 @@ export default function App() {
             <Route path="users" element={<AdminUsers />} />
             <Route path="verification" element={<AdminVerification />} />
             <Route path="analytics" element={<AdminAnalytics />} />
+            <Route path="settings" element={<SettingsPage />} />
           </Route>
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

@@ -34,8 +34,12 @@ export default function Sidebar({ navItems, role }: SidebarProps) {
   }[role];
 
   const handleSignOut = async () => {
+    // Navigate off the protected route FIRST so that when signOut flips
+    // isAuthenticated to false, the layout's <Unauthenticated> branch (which
+    // otherwise bounces to /?auth=1 and re-opens the sign-in modal) never
+    // gets a chance to fire.
+    navigate("/", { replace: true });
     await signout();
-    navigate("/");
   };
 
   return (
