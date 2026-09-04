@@ -2,8 +2,34 @@ import { v, ConvexError } from "convex/values";
 import { mutation, query, type MutationCtx, type QueryCtx } from "./_generated/server";
 import { paginationOptsValidator } from "convex/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { computePayslip } from "./lib/payeCalc";
+import { computePayslip, type CountryCode, type ComputeOptions } from "./lib/payeCalc";
 import { notify } from "./notifications";
+
+const VALID_COUNTRIES: CountryCode[] = ["NG", "KE", "GH", "ZA", "EG"];
+function toCountry(c?: string): CountryCode {
+  const up = (c ?? "NG").toUpperCase();
+  return (VALID_COUNTRIES as string[]).includes(up) ? (up as CountryCode) : "NG";
+}
+
+function optsFor(contract: {
+  grossMonthlyNGN: number;
+  pensionRatePct: number;
+  employerPensionRatePct: number;
+  nhfEligible: boolean;
+  country?: string;
+}): ComputeOptions {
+  const country = toCountry(contract.country);
+  if (country === "NG") {
+    return {
+      country: "NG",
+      grossMonthly: contract.grossMonthlyNGN,
+      pensionRatePct: contract.pensionRatePct,
+      employerPensionRatePct: contract.employerPensionRatePct,
+      nhfEligible: contract.nhfEligible,
+    };
+  }
+  return { country, grossMonthly: contract.grossMonthlyNGN };
+}
 
 async function requireEmployer(ctx: QueryCtx | MutationCtx) {
   const userId = await getAuthUserId(ctx);
@@ -24,6 +50,7 @@ async function getCurrent(ctx: QueryCtx | MutationCtx) {
 
 export const previewPayslip = query({
   args: {
+    country: v.optional(v.string()),
     grossMonthly: v.number(),
     pensionRatePct: v.number(),
     employerPensionRatePct: v.number(),
@@ -31,7 +58,13 @@ export const previewPayslip = query({
   },
   handler: async (_ctx, args) => {
     if (args.grossMonthly < 0) throw new ConvexError({ message: "Gross must be >= 0", code: "BAD" });
-    return computePayslip(args);
+    return computePayslip(optsFor({
+      grossMonthlyNGN: args.grossMonthly,
+      pensionRatePct: args.pensionRatePct,
+      employerPensionRatePct: args.employerPensionRatePct,
+      nhfEligible: args.nhfEligible,
+      country: args.country,
+    }));
   },
 });
 
@@ -65,6 +98,7 @@ export const createContract = mutation({
     pensionRatePct: v.optional(v.number()),
     employerPensionRatePct: v.optional(v.number()),
     nhfEligible: v.optional(v.boolean()),
+    country: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const employer = await requireEmployer(ctx);
@@ -73,6 +107,7 @@ export const createContract = mutation({
       throw new ConvexError({ message: "Candidate not found", code: "NOT_FOUND" });
     if (args.grossMonthlyNGN <= 0)
       throw new ConvexError({ message: "Gross must be > 0", code: "BAD" });
+    const country = toCountry(args.country);
 
     return await ctx.db.insert("eorContracts", {
       employerId: employer._id,
@@ -85,6 +120,7 @@ export const createContract = mutation({
       employerPensionRatePct: args.employerPensionRatePct ?? 10,
       nhfEligible: args.nhfEligible ?? false,
       status: "draft",
+      country,
     });
   },
 });
@@ -167,17 +203,12 @@ export const runPayroll = mutation({
     let totals = { gross: 0, paye: 0, pension: 0, nhf: 0, net: 0, employerPension: 0 };
 
     for (const c of active) {
-      const calc = computePayslip({
-        grossMonthly: c.grossMonthlyNGN,
-        pensionRatePct: c.pensionRatePct,
-        employerPensionRatePct: c.employerPensionRatePct,
-        nhfEligible: c.nhfEligible,
-      });
+      const calc = computePayslip(optsFor(c));
       await notify(ctx, {
         userId: c.candidateId,
         kind: "payslip",
         title: `New payslip: ${args.period}`,
-        body: `Net ₦${Math.round(calc.net).toLocaleString()}`,
+        body: `Net ${Math.round(calc.net).toLocaleString()} ${calc.currency}`,
         link: "/candidate/payslips",
       });
       await ctx.db.insert("payslips", {
@@ -195,6 +226,9 @@ export const runPayroll = mutation({
         net: calc.net,
         employerPension: calc.employerPension,
         breakdown: JSON.stringify(calc.bands),
+        country: calc.country,
+        currency: calc.currency,
+        otherDeductionsJson: JSON.stringify(calc.otherDeductions),
       });
       totals.gross += calc.gross;
       totals.paye += calc.paye;

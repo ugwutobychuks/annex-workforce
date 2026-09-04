@@ -146,6 +146,8 @@ export default defineSchema({
     status: v.union(v.literal("draft"), v.literal("active"), v.literal("terminated")),
     terminatedAt: v.optional(v.number()),
     terminationReason: v.optional(v.string()),
+    // M16: ISO country code (NG default for backward compat with pre-M16 rows)
+    country: v.optional(v.string()),
   })
     .index("by_employer", ["employerId"])
     .index("by_candidate", ["candidateId"])
@@ -389,6 +391,10 @@ export default defineSchema({
     net: v.number(),
     employerPension: v.number(),
     breakdown: v.string(),
+    // M16: extras for non-NG countries (kept optional for old rows)
+    country: v.optional(v.string()),
+    currency: v.optional(v.string()),
+    otherDeductionsJson: v.optional(v.string()),
   })
     .index("by_run", ["runId"])
     .index("by_candidate", ["candidateId"])

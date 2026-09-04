@@ -58,7 +58,12 @@ function CreateContractDialog({
   const [gross, setGross] = useState("");
   const [startDate, setStartDate] = useState("");
   const [nhf, setNhf] = useState(false);
+  const [country, setCountry] = useState<"NG" | "KE" | "GH" | "ZA" | "EG">("NG");
   const [busy, setBusy] = useState(false);
+
+  const currencySymbol: Record<string, string> = {
+    NG: "₦", KE: "KSh", GH: "GH₵", ZA: "R", EG: "E£",
+  };
 
   const submit = async () => {
     const g = Number(gross);
@@ -73,7 +78,8 @@ function CreateContractDialog({
         jobTitle,
         grossMonthlyNGN: g,
         startDate,
-        nhfEligible: nhf,
+        nhfEligible: country === "NG" ? nhf : false,
+        country,
       });
       toast.success("Contract created as draft. Activate it to include in payroll runs.");
       onClose();
@@ -109,21 +115,43 @@ function CreateContractDialog({
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label>Gross monthly (₦)</Label>
-              <Input type="number" min="0" value={gross} onChange={(e) => setGross(e.target.value)} placeholder="850000" />
+              <Label>Country of employment</Label>
+              <Select value={country} onValueChange={(v) => setCountry(v as never)}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="NG">🇳🇬 Nigeria (NGN)</SelectItem>
+                  <SelectItem value="KE">🇰🇪 Kenya (KES)</SelectItem>
+                  <SelectItem value="GH">🇬🇭 Ghana (GHS)</SelectItem>
+                  <SelectItem value="ZA">🇿🇦 South Africa (ZAR)</SelectItem>
+                  <SelectItem value="EG">🇪🇬 Egypt (EGP)</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <Label>Start date</Label>
               <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
             </div>
           </div>
-          <div className="flex items-center justify-between rounded-lg border p-3">
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <p className="text-sm font-medium">NHF eligible</p>
-              <p className="text-xs text-muted-foreground">Deduct 2.5% for the National Housing Fund.</p>
+              <Label>Gross monthly ({currencySymbol[country]})</Label>
+              <Input type="number" min="0" value={gross} onChange={(e) => setGross(e.target.value)} placeholder="850000" />
             </div>
-            <Switch checked={nhf} onCheckedChange={setNhf} />
+            <div className="flex items-end">
+              <p className="text-xs text-muted-foreground">
+                PAYE and statutory deductions use the country's current published rates. See docs before running in production.
+              </p>
+            </div>
           </div>
+          {country === "NG" && (
+            <div className="flex items-center justify-between rounded-lg border p-3">
+              <div>
+                <p className="text-sm font-medium">NHF eligible</p>
+                <p className="text-xs text-muted-foreground">Deduct 2.5% for the National Housing Fund.</p>
+              </div>
+              <Switch checked={nhf} onCheckedChange={setNhf} />
+            </div>
+          )}
         </div>
         <DialogFooter>
           <Button variant="secondary" onClick={onClose}>Cancel</Button>
