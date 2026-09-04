@@ -36,7 +36,13 @@ Then start the Convex dev deployment. This is a one-time setup — it'll open a 
 npx convex dev
 ```
 
-Leave that running in one terminal. In another terminal, start the web app:
+Once `Convex functions ready!` prints, provision the auth keys (one-off, per deployment). Convex Auth signs sessions with a `JWT_PRIVATE_KEY` that this script generates and installs into your deployment's env:
+
+```bash
+npx @convex-dev/auth --skip-git-check
+```
+
+Without this, sign-up throws `Missing environment variable JWT_PRIVATE_KEY`. You only run it once — leave `npx convex dev` running in one terminal and start the web app in another:
 
 ```bash
 npm run dev:web
