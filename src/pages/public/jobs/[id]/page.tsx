@@ -1,15 +1,15 @@
-import { useQuery, useMutation } from "convex/react";
+import { useQuery, useMutation, useConvexAuth } from "convex/react";
 import { api } from "@/convex/_generated/api.js";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button.tsx";
-import { Badge } from "@/components/ui/badge.tsx";
-import { Skeleton } from "@/components/ui/skeleton.tsx";
-import { Textarea } from "@/components/ui/textarea.tsx";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog.tsx";
-import { ArrowLeftIcon, MapPinIcon, DollarSignIcon, CheckCircleIcon } from "lucide-react";
-import type { Id } from "@/convex/_generated/dataModel.d.ts";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ArrowLeftIcon, MapPinIcon, DollarSignIcon, CheckCircleIcon, LogInIcon } from "lucide-react";
+import type { Id } from "@/convex/_generated/dataModel";
 import { ConvexError } from "convex/values";
 
 const JOB_TYPE_COLORS = {
@@ -19,12 +19,22 @@ const JOB_TYPE_COLORS = {
   "internship": "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300",
 } as const;
 
-export default function JobDetail() {
+export default function PublicJobDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { isAuthenticated, isLoading: authLoading } = useConvexAuth();
+
   const job = useQuery(api.jobs.getById, id ? { id: id as Id<"jobs"> } : "skip");
-  const hasApplied = useQuery(api.applications.hasApplied, id ? { jobId: id as Id<"jobs"> } : "skip");
+  // Only ask "have I applied?" when signed in — the query is safe when unauth
+  // (returns false), but skipping avoids a needless subscription.
+  const hasApplied = useQuery(
+    api.applications.hasApplied,
+    isAuthenticated && id ? { jobId: id as Id<"jobs"> } : "skip"
+  );
+  const currentUser = useQuery(api.users.getCurrentUser, isAuthenticated ? {} : "skip");
   const applyMutation = useMutation(api.applications.apply);
+
   const [coverLetter, setCoverLetter] = useState("");
   const [open, setOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -38,17 +48,31 @@ export default function JobDetail() {
       </div>
     );
   }
-
   if (!job) {
     return (
       <div className="max-w-3xl text-center py-16">
         <p className="text-muted-foreground">Job not found.</p>
-        <Button variant="secondary" className="mt-4" onClick={() => navigate("/candidate/jobs")}>
-          Back to Jobs
+        <Button variant="secondary" className="mt-4" onClick={() => navigate("/jobs")}>
+          Back to Marketplace
         </Button>
       </div>
     );
   }
+
+  const goSignIn = () => {
+    // Return the visitor to this exact page after they sign in / register.
+    const next = encodeURIComponent(location.pathname);
+    navigate(`/login?next=${next}`);
+  };
+
+  const openApply = () => {
+    if (!isAuthenticated) return goSignIn();
+    if (currentUser && currentUser.role !== "candidate") {
+      toast.error("Only candidates can apply to jobs. Sign in with a candidate account.");
+      return;
+    }
+    setOpen(true);
+  };
 
   const handleApply = async () => {
     setSubmitting(true);
@@ -71,8 +95,8 @@ export default function JobDetail() {
 
   return (
     <div className="max-w-3xl space-y-6">
-      <Button variant="ghost" size="sm" className="gap-2" onClick={() => navigate("/candidate/jobs")}>
-        <ArrowLeftIcon className="w-4 h-4" /> Back to Jobs
+      <Button variant="ghost" size="sm" className="gap-2" onClick={() => navigate("/jobs")}>
+        <ArrowLeftIcon className="w-4 h-4" /> Back to Marketplace
       </Button>
 
       <div className="space-y-2">
@@ -94,36 +118,40 @@ export default function JobDetail() {
       )}
 
       <div>
-        {hasApplied ? (
+        {authLoading ? (
+          <Skeleton className="h-10 w-32" />
+        ) : hasApplied ? (
           <div className="flex items-center gap-2 text-green-600 font-medium">
             <CheckCircleIcon className="w-5 h-5" /> You've applied to this job
           </div>
+        ) : !isAuthenticated ? (
+          <Button size="lg" onClick={goSignIn}>
+            <LogInIcon className="w-4 h-4 mr-2" /> Sign in to apply
+          </Button>
         ) : (
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button size="lg">Apply Now</Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Apply to {job.title}</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium block mb-2">Cover Letter (optional)</label>
-                  <Textarea
-                    rows={6}
-                    placeholder="Tell the employer why you're a great fit..."
-                    value={coverLetter}
-                    onChange={(e) => setCoverLetter(e.target.value)}
-                  />
-                </div>
-                <Button className="w-full" onClick={handleApply} disabled={submitting}>
-                  {submitting ? "Submitting..." : "Submit Application"}
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
+          <Button size="lg" onClick={openApply}>Apply Now</Button>
         )}
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Apply to {job.title}</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium block mb-2">Cover Letter (optional)</label>
+                <Textarea
+                  rows={6}
+                  placeholder="Tell the employer why you're a great fit..."
+                  value={coverLetter}
+                  onChange={(e) => setCoverLetter(e.target.value)}
+                />
+              </div>
+              <Button className="w-full" onClick={handleApply} disabled={submitting}>
+                {submitting ? "Submitting..." : "Submit Application"}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <div className="space-y-4">

@@ -7,10 +7,10 @@ import { Button } from "@/components/ui/button.tsx";
 import { useNavigate } from "react-router-dom";
 
 export default function AdminDashboard() {
-  const users = useQuery(api.users.getAllUsers);
+  const analytics = useQuery(api.admin.getPlatformAnalytics);
   const navigate = useNavigate();
 
-  if (users === undefined) {
+  if (analytics === undefined) {
     return (
       <div className="space-y-6">
         <Skeleton className="h-8 w-64" />
@@ -21,15 +21,11 @@ export default function AdminDashboard() {
     );
   }
 
-  const candidates = users.filter((u: { role?: string }) => u.role === "candidate").length;
-  const employers = users.filter((u: { role?: string }) => u.role === "employer").length;
-  const total = users.length;
-
   const stats = [
-    { label: "Total Users", value: String(total), icon: UsersIcon, color: "text-blue-500" },
-    { label: "Candidates", value: String(candidates), icon: UsersIcon, color: "text-green-500" },
-    { label: "Employers", value: String(employers), icon: BriefcaseIcon, color: "text-yellow-500" },
-    { label: "Pending Verifications", value: "0", icon: ShieldCheckIcon, color: "text-red-500" },
+    { label: "Total Users", value: String(analytics.users.total), icon: UsersIcon, color: "text-blue-500" },
+    { label: "Candidates", value: String(analytics.users.candidates), icon: UsersIcon, color: "text-green-500" },
+    { label: "Employers", value: String(analytics.users.employers), icon: BriefcaseIcon, color: "text-yellow-500" },
+    { label: "Pending Verifications", value: String(analytics.verifications.pending), icon: ShieldCheckIcon, color: "text-red-500" },
   ];
 
   return (

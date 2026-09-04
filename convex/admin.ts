@@ -21,10 +21,11 @@ export const listUsers = query({
   handler: async (ctx, args) => {
     await requireAdmin(ctx);
 
-    const page = args.role
+    const roleFilter = args.role;
+    const page = roleFilter
       ? await ctx.db
           .query("users")
-          .withIndex("by_role", (q) => q.eq("role", args.role))
+          .withIndex("by_role", (q) => q.eq("role", roleFilter))
           .order("desc")
           .paginate(args.paginationOpts)
       : await ctx.db.query("users").order("desc").paginate(args.paginationOpts);
@@ -77,10 +78,11 @@ export const listVerifications = query({
   },
   handler: async (ctx, args) => {
     await requireAdmin(ctx);
-    const page = args.status
+    const statusFilter = args.status;
+    const page = statusFilter
       ? await ctx.db
           .query("verificationRequests")
-          .withIndex("by_status", (q) => q.eq("status", args.status))
+          .withIndex("by_status", (q) => q.eq("status", statusFilter))
           .order("desc")
           .paginate(args.paginationOpts)
       : await ctx.db.query("verificationRequests").order("desc").paginate(args.paginationOpts);

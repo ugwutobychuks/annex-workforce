@@ -64,7 +64,7 @@ export default function CandidateDashboard() {
       <div>
         <h3 className="font-semibold mb-3">Quick Actions</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <Button variant="secondary" className="justify-start gap-2 h-12" onClick={() => navigate("/candidate/jobs")}>
+          <Button variant="secondary" className="justify-start gap-2 h-12" onClick={() => navigate("/jobs")}>
             <BriefcaseIcon className="w-4 h-4" /> Browse Jobs
           </Button>
           <Button variant="secondary" className="justify-start gap-2 h-12" onClick={() => navigate("/candidate/profile")}>

@@ -1,15 +1,15 @@
 import { usePaginatedQuery } from "convex/react";
 import { api } from "@/convex/_generated/api.js";
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card.tsx";
-import { Badge } from "@/components/ui/badge.tsx";
-import { Button } from "@/components/ui/button.tsx";
-import { Input } from "@/components/ui/input.tsx";
-import { Skeleton } from "@/components/ui/skeleton.tsx";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigate } from "react-router-dom";
 import { SearchIcon, MapPinIcon, BriefcaseIcon, DollarSignIcon } from "lucide-react";
-import { useDebounce } from "@/hooks/use-debounce.ts";
-import type { Id } from "@/convex/_generated/dataModel.d.ts";
+import { useDebounce } from "@/hooks/use-debounce";
+import type { Id } from "@/convex/_generated/dataModel";
 
 const JOB_TYPE_COLORS = {
   "full-time": "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
@@ -36,7 +36,7 @@ function JobCard({ job }: { job: Job }) {
   return (
     <Card
       className="cursor-pointer hover:border-primary/50 hover:shadow-sm transition-all"
-      onClick={() => navigate(`/candidate/jobs/${job._id}`)}
+      onClick={() => navigate(`/jobs/${job._id}`)}
     >
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between gap-2">
@@ -56,7 +56,7 @@ function JobCard({ job }: { job: Job }) {
         </div>
         {job.skills.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
-            {job.skills.slice(0, 5).map((s) => (
+            {job.skills.slice(0, 5).map((s: string) => (
               <Badge key={s} variant="secondary" className="text-xs">{s}</Badge>
             ))}
             {job.skills.length > 5 && (
@@ -69,9 +69,9 @@ function JobCard({ job }: { job: Job }) {
   );
 }
 
-export default function BrowseJobs() {
+export default function PublicJobs() {
   const [searchInput, setSearchInput] = useState("");
-  const [debouncedSearch] = useDebounce(searchInput, 400);
+  const debouncedSearch = useDebounce(searchInput, 400);
 
   const { results, status, loadMore } = usePaginatedQuery(
     api.jobs.listPublished,
@@ -80,35 +80,37 @@ export default function BrowseJobs() {
   );
 
   return (
-    <div className="space-y-6 max-w-4xl">
+    <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold">Browse Jobs</h2>
-        <p className="text-muted-foreground mt-1">Find your next opportunity.</p>
+        <h2 className="text-3xl font-bold">Talent Marketplace</h2>
+        <p className="text-muted-foreground mt-1">
+          Browse open roles from verified African employers. Sign in only when you're ready to apply.
+        </p>
       </div>
 
-      <div className="relative">
+      <div className="relative max-w-xl">
         <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
           className="pl-9"
-          placeholder="Search job titles..."
+          placeholder="Search job titles…"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
         />
       </div>
 
       {status === "LoadingFirstPage" ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-40" />)}
         </div>
       ) : results.length === 0 ? (
         <div className="text-center py-16 text-muted-foreground">
           <BriefcaseIcon className="w-10 h-10 mx-auto mb-3 opacity-30" />
           <p className="font-medium">No jobs found</p>
-          <p className="text-sm mt-1">Try a different search term</p>
+          <p className="text-sm mt-1">Try a different search term.</p>
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {results.map((job) => <JobCard key={job._id} job={job as Job} />)}
           </div>
           {status === "CanLoadMore" && (

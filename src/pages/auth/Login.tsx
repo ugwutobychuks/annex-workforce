@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,6 +16,11 @@ import { LogInIcon, UserPlusIcon } from "lucide-react";
 export default function Login() {
   const { signIn } = useAuthActions();
   const navigate = useNavigate();
+  const [params] = useSearchParams();
+  // Where to send the visitor after auth succeeds. Only accept in-app
+  // paths (starting with "/") to prevent open-redirect abuse.
+  const nextRaw = params.get("next");
+  const next = nextRaw && nextRaw.startsWith("/") ? nextRaw : null;
   const [mode, setMode] = useState<"signIn" | "signUp">("signIn");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -37,7 +42,14 @@ export default function Login() {
       if (mode === "signUp" && name) data.set("name", name);
       await signIn("password", data);
       toast.success(mode === "signIn" ? "Welcome back." : "Account created.");
-      navigate("/onboarding/role");
+      // For a brand-new account we must send them through role selection first,
+      // carrying `next` so they land back where they started after onboarding.
+      // An existing user with a role goes straight back to `next`.
+      if (mode === "signUp") {
+        navigate(next ? `/onboarding/role?next=${encodeURIComponent(next)}` : "/onboarding/role");
+      } else {
+        navigate(next ?? "/onboarding/role");
+      }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Sign-in failed.";
       toast.error(msg);

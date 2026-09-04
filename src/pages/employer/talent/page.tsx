@@ -10,7 +10,7 @@ import { useDebounce } from "@/hooks/use-debounce.ts";
 
 export default function TalentPool() {
   const [searchInput, setSearchInput] = useState("");
-  const [debouncedSearch] = useDebounce(searchInput, 400);
+  const debouncedSearch = useDebounce(searchInput, 400);
 
   const result = useQuery(api.employer.searchTalentPool, {
     search: debouncedSearch || undefined,

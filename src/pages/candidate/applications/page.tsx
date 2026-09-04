@@ -48,7 +48,7 @@ export default function MyApplications() {
           <FileTextIcon className="w-10 h-10 mx-auto mb-3 opacity-30" />
           <p className="font-medium">No applications yet</p>
           <p className="text-sm mt-1">Browse jobs and apply to get started.</p>
-          <Button variant="secondary" className="mt-4" onClick={() => navigate("/candidate/jobs")}>
+          <Button variant="secondary" className="mt-4" onClick={() => navigate("/jobs")}>
             Browse Jobs
           </Button>
         </div>
@@ -60,7 +60,7 @@ export default function MyApplications() {
               <Card
                 key={app._id}
                 className="cursor-pointer hover:border-primary/40 transition-colors"
-                onClick={() => app.job && navigate(`/candidate/jobs/${app.jobId as Id<"jobs">}`)}
+                onClick={() => app.job && navigate(`/jobs/${app.jobId as Id<"jobs">}`)}
               >
                 <CardHeader className="pb-2">
                   <div className="flex items-start justify-between gap-3">

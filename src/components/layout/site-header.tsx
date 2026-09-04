@@ -1,26 +1,51 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
-import { toast } from "sonner";
 import { Authenticated, AuthLoading, Unauthenticated } from "convex/react";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api.js";
 import Logo from "@/components/brand/logo.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { SignInButton } from "@/components/ui/signin.tsx";
 import { Skeleton } from "@/components/ui/skeleton.tsx";
 
-const NAV_LINKS = [
-  { label: "Talent Marketplace", target: "marketplace" },
-  { label: "Managed Hiring", target: "eor" },
-  { label: "HR Platform", target: "hrms" },
-  { label: "Pricing", target: "pricing" },
-] as const;
+type NavLink = { label: string; kind: "route" | "anchor"; target: string };
+
+const NAV_LINKS: NavLink[] = [
+  { label: "Talent Marketplace", kind: "route", target: "/jobs" },
+  { label: "Managed Hiring", kind: "anchor", target: "eor" },
+  { label: "HR Platform", kind: "anchor", target: "hrms" },
+  { label: "Pricing", kind: "anchor", target: "pricing" },
+];
+
+function DashboardCta() {
+  const user = useQuery(api.users.getCurrentUser);
+  const navigate = useNavigate();
+  const go = () => {
+    const role = user?.role;
+    if (!role) navigate("/onboarding/role");
+    else if (role === "candidate") navigate("/candidate");
+    else if (role === "employer") navigate("/employer");
+    else navigate("/admin");
+  };
+  return <Button size="sm" onClick={go}>Go to dashboard</Button>;
+}
 
 export default function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const scrollTo = (id: string) => {
+  const handleNav = (link: NavLink) => {
     setOpen(false);
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    if (link.kind === "route") {
+      navigate(link.target);
+    } else if (location.pathname !== "/") {
+      // Anchors live on the landing page. If we're elsewhere, jump home first.
+      navigate(`/#${link.target}`);
+    } else {
+      document.getElementById(link.target)?.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   return (
@@ -35,7 +60,7 @@ export default function SiteHeader() {
             <button
               key={link.target}
               type="button"
-              onClick={() => scrollTo(link.target)}
+              onClick={() => handleNav(link)}
               className="cursor-pointer text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
             >
               {link.label}
@@ -48,33 +73,11 @@ export default function SiteHeader() {
             <Skeleton className="h-9 w-40" />
           </AuthLoading>
           <Unauthenticated>
-            <SignInButton
-              variant="ghost"
-              size="sm"
-              showIcon={false}
-              signInText="Sign in"
-            />
-            <Button
-              size="sm"
-              className="cursor-pointer"
-              onClick={() =>
-                toast.info("Talent and employer onboarding is coming soon in a future milestone!")
-              }
-            >
-              Book a demo
-            </Button>
+            <SignInButton variant="ghost" size="sm" showIcon={false} signInText="Sign in" />
+            <Button size="sm" onClick={() => navigate("/jobs")}>Browse jobs</Button>
           </Unauthenticated>
           <Authenticated>
-            <Button
-              size="sm"
-              className="cursor-pointer"
-              onClick={() =>
-                toast.info("Your dashboard is coming soon in a future milestone!")
-              }
-            >
-              Go to dashboard
-            </Button>
-            <SignInButton variant="ghost" size="sm" showIcon={false} />
+            <DashboardCta />
           </Authenticated>
         </div>
 
@@ -95,7 +98,7 @@ export default function SiteHeader() {
               <button
                 key={link.target}
                 type="button"
-                onClick={() => scrollTo(link.target)}
+                onClick={() => handleNav(link)}
                 className="cursor-pointer rounded-sm px-2 py-2.5 text-left text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
               >
                 {link.label}
@@ -105,9 +108,12 @@ export default function SiteHeader() {
           <div className="flex flex-col gap-2 pt-3">
             <Unauthenticated>
               <SignInButton className="w-full" showIcon={false} signInText="Sign in" />
+              <Button className="w-full" onClick={() => { setOpen(false); navigate("/jobs"); }}>
+                Browse jobs
+              </Button>
             </Unauthenticated>
             <Authenticated>
-              <SignInButton className="w-full" showIcon={false} />
+              <DashboardCta />
             </Authenticated>
           </div>
         </div>

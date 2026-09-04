@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api.js";
 import { Authenticated, Unauthenticated } from "convex/react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { motion } from "motion/react";
 import { SignInButton } from "@/components/ui/signin.tsx";
@@ -11,19 +11,24 @@ function RoleSelectInner() {
   const user = useQuery(api.users.getCurrentUser);
   const setRole = useMutation(api.users.setRole);
   const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const nextRaw = params.get("next");
+  const next = nextRaw && nextRaw.startsWith("/") ? nextRaw : null;
+
+  const roleHome = (role: "candidate" | "employer" | "admin") =>
+    role === "candidate" ? "/candidate" : role === "employer" ? "/employer" : "/admin";
 
   if (user?.role) {
-    if (user.role === "candidate") navigate("/candidate");
-    else if (user.role === "employer") navigate("/employer");
-    else navigate("/admin");
+    // If they already have a role, honor `next` (e.g. the job they were about
+    // to apply to) — but only if it's an in-app path; otherwise their dashboard.
+    navigate(next ?? roleHome(user.role));
     return null;
   }
 
   const handleSelect = async (role: "candidate" | "employer") => {
     try {
       await setRole({ role });
-      if (role === "candidate") navigate("/candidate");
-      else navigate("/employer");
+      navigate(next ?? roleHome(role));
     } catch {
       toast.error("Failed to set role. Please try again.");
     }

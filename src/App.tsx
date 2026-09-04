@@ -8,10 +8,11 @@ import RoleSelect from "./pages/onboarding/RoleSelect.tsx";
 import CandidateLayout from "./pages/candidate/layout.tsx";
 import CandidateDashboard from "./pages/candidate/dashboard/page.tsx";
 import CandidateProfile from "./pages/candidate/profile/page.tsx";
-import BrowseJobs from "./pages/candidate/jobs/page.tsx";
-import JobDetail from "./pages/candidate/jobs/[id]/page.tsx";
 import MyApplications from "./pages/candidate/applications/page.tsx";
 import MyPayslips from "./pages/candidate/payslips/page.tsx";
+import PublicLayout from "./pages/public/layout.tsx";
+import PublicJobs from "./pages/public/jobs/page.tsx";
+import PublicJobDetail from "./pages/public/jobs/[id]/page.tsx";
 import EmployerLayout from "./pages/employer/layout.tsx";
 import EmployerDashboard from "./pages/employer/dashboard/page.tsx";
 import CompanyProfile from "./pages/employer/company/page.tsx";
@@ -36,12 +37,16 @@ export default function App() {
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/onboarding/role" element={<RoleSelect />} />
 
+          {/* Public marketplace — no auth needed to browse */}
+          <Route element={<PublicLayout />}>
+            <Route path="/jobs" element={<PublicJobs />} />
+            <Route path="/jobs/:id" element={<PublicJobDetail />} />
+          </Route>
+
           {/* Candidate routes */}
           <Route path="/candidate" element={<CandidateLayout />}>
             <Route index element={<CandidateDashboard />} />
             <Route path="profile" element={<CandidateProfile />} />
-            <Route path="jobs" element={<BrowseJobs />} />
-            <Route path="jobs/:id" element={<JobDetail />} />
             <Route path="applications" element={<MyApplications />} />
             <Route path="payslips" element={<MyPayslips />} />
           </Route>

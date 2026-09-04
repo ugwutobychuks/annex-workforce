@@ -18,7 +18,7 @@ import {
 const navItems = [
   { label: "Dashboard", href: "/candidate", icon: LayoutDashboardIcon },
   { label: "My Profile", href: "/candidate/profile", icon: UserIcon },
-  { label: "Browse Jobs", href: "/candidate/jobs", icon: BriefcaseIcon },
+  { label: "Browse Jobs", href: "/jobs", icon: BriefcaseIcon },
   { label: "Applications", href: "/candidate/applications", icon: FileTextIcon },
   { label: "Payslips", href: "/candidate/payslips", icon: DollarSignIcon },
 ];
