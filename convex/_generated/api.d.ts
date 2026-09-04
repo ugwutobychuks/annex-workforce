@@ -25,6 +25,7 @@ import type * as messages from "../messages.js";
 import type * as notifications from "../notifications.js";
 import type * as payments from "../payments.js";
 import type * as payroll from "../payroll.js";
+import type * as reviews from "../reviews.js";
 import type * as seed from "../seed.js";
 import type * as signatures from "../signatures.js";
 import type * as users from "../users.js";
@@ -54,6 +55,7 @@ declare const fullApi: ApiFromModules<{
   notifications: typeof notifications;
   payments: typeof payments;
   payroll: typeof payroll;
+  reviews: typeof reviews;
   seed: typeof seed;
   signatures: typeof signatures;
   users: typeof users;

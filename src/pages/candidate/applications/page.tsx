@@ -5,8 +5,10 @@ import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { Skeleton } from "@/components/ui/skeleton.tsx";
-import { FileTextIcon, MapPinIcon, CalendarIcon, MessageSquareIcon } from "lucide-react";
+import { FileTextIcon, MapPinIcon, CalendarIcon, MessageSquareIcon, StarIcon } from "lucide-react";
 import type { Id } from "@/convex/_generated/dataModel.d.ts";
+import { useState } from "react";
+import { RateHireDialog } from "@/components/rate-hire-dialog.tsx";
 
 const STATUS_STYLES = {
   applied:     { label: "Applied",     cls: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300" },
@@ -28,6 +30,8 @@ export default function MyApplications() {
     {},
     { initialNumItems: 20 }
   );
+
+  const [rateFor, setRateFor] = useState<Id<"applications"> | null>(null);
 
   const messageEmployer = async (applicationId: Id<"applications">) => {
     try {
@@ -95,13 +99,24 @@ export default function MyApplications() {
                         Applied {new Date(app._creationTime).toLocaleDateString()}
                       </span>
                     </div>
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      onClick={(e) => { e.stopPropagation(); messageEmployer(app._id); }}
-                    >
-                      <MessageSquareIcon className="w-3.5 h-3.5 mr-1" /> Message
-                    </Button>
+                    <div className="flex gap-2">
+                      {app.status === "hired" && (
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={(e) => { e.stopPropagation(); setRateFor(app._id); }}
+                        >
+                          <StarIcon className="w-3.5 h-3.5 mr-1" /> Rate employer
+                        </Button>
+                      )}
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={(e) => { e.stopPropagation(); messageEmployer(app._id); }}
+                      >
+                        <MessageSquareIcon className="w-3.5 h-3.5 mr-1" /> Message
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -113,6 +128,10 @@ export default function MyApplications() {
             </div>
           )}
         </div>
+      )}
+
+      {rateFor && (
+        <RateHireDialog applicationId={rateFor} open={!!rateFor} onClose={() => setRateFor(null)} />
       )}
     </div>
   );

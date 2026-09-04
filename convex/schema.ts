@@ -187,6 +187,22 @@ export default defineSchema({
     body: v.string(),
   }).index("by_thread", ["threadId"]),
 
+  // ── M13 post-hire reviews ───────────────────────────────────────────────────
+  reviews: defineTable({
+    fromUserId: v.id("users"),
+    toUserId: v.id("users"),
+    applicationId: v.id("applications"),
+    rating: v.number(), // 1..5
+    comment: v.optional(v.string()),
+    kind: v.union(
+      v.literal("candidate_of_employer"),
+      v.literal("employer_of_candidate")
+    ),
+  })
+    .index("by_to_user", ["toUserId"])
+    .index("by_application", ["applicationId"])
+    .index("by_from_and_application", ["fromUserId", "applicationId"]),
+
   // ── M12 HRMS ────────────────────────────────────────────────────────────────
   leaveRequests: defineTable({
     userId: v.id("users"),
