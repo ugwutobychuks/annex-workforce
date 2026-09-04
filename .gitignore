@@ -7,6 +7,9 @@ out/
 .env.local
 .env.*.local
 *.log
+# Local dev credentials — never commit
+accounts info*
+accounts-info*
 .DS_Store
 .idea/
 .vscode/
