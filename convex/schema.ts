@@ -148,10 +148,15 @@ export default defineSchema({
     terminationReason: v.optional(v.string()),
     // M16: ISO country code (NG default for backward compat with pre-M16 rows)
     country: v.optional(v.string()),
+    // Post-hire linkage: the application this contract was created from,
+    // if any. Lets the applicant kanban show "already has an active contract"
+    // and prevents duplicates.
+    applicationId: v.optional(v.id("applications")),
   })
     .index("by_employer", ["employerId"])
     .index("by_candidate", ["candidateId"])
-    .index("by_status", ["status"]),
+    .index("by_status", ["status"])
+    .index("by_application", ["applicationId"]),
 
   payrollRuns: defineTable({
     employerId: v.id("users"),

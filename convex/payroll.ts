@@ -99,6 +99,8 @@ export const createContract = mutation({
     employerPensionRatePct: v.optional(v.number()),
     nhfEligible: v.optional(v.boolean()),
     country: v.optional(v.string()),
+    // Optional: link the contract to the hired application it grew out of.
+    applicationId: v.optional(v.id("applications")),
   },
   handler: async (ctx, args) => {
     const employer = await requireEmployer(ctx);
@@ -108,6 +110,27 @@ export const createContract = mutation({
     if (args.grossMonthlyNGN <= 0)
       throw new ConvexError({ message: "Gross must be > 0", code: "BAD" });
     const country = toCountry(args.country);
+
+    // If we're anchoring to an application, ensure that application is hired
+    // and doesn't already have a live contract. Enforces the "contract ← hire"
+    // invariant this app is designed around.
+    if (args.applicationId) {
+      const app = await ctx.db.get(args.applicationId);
+      if (!app) throw new ConvexError({ message: "Application not found", code: "NOT_FOUND" });
+      if (app.candidateId !== args.candidateId)
+        throw new ConvexError({ message: "Application/candidate mismatch", code: "BAD" });
+      const job = await ctx.db.get(app.jobId);
+      if (!job || job.employerId !== employer._id)
+        throw new ConvexError({ message: "Not your application", code: "FORBIDDEN" });
+      if (app.status !== "hired")
+        throw new ConvexError({ message: "Application must be Hired first", code: "CONFLICT" });
+      const existing = await ctx.db
+        .query("eorContracts")
+        .withIndex("by_application", (q) => q.eq("applicationId", args.applicationId))
+        .collect();
+      if (existing.some((c) => c.status !== "terminated"))
+        throw new ConvexError({ message: "This hire already has a live contract", code: "CONFLICT" });
+    }
 
     return await ctx.db.insert("eorContracts", {
       employerId: employer._id,
@@ -121,7 +144,30 @@ export const createContract = mutation({
       nhfEligible: args.nhfEligible ?? false,
       status: "draft",
       country,
+      applicationId: args.applicationId,
     });
+  },
+});
+
+/**
+ * "Do I have a live contract already for this hire?" — used by the applicant
+ * detail dialog to hide the "Create EOR contract" button once one exists.
+ */
+export const getContractForApplication = query({
+  args: { applicationId: v.id("applications") },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
+    const app = await ctx.db.get(args.applicationId);
+    if (!app) return null;
+    const job = await ctx.db.get(app.jobId);
+    if (!job) return null;
+    if (job.employerId !== userId && app.candidateId !== userId) return null;
+    const rows = await ctx.db
+      .query("eorContracts")
+      .withIndex("by_application", (q) => q.eq("applicationId", args.applicationId))
+      .collect();
+    return rows.find((c) => c.status !== "terminated") ?? null;
   },
 });
 

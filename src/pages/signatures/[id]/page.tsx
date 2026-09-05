@@ -11,8 +11,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { ChevronLeftIcon, SendIcon, CheckCircleIcon, XCircleIcon, DownloadIcon } from "lucide-react";
+import { ChevronLeftIcon, SendIcon, CheckCircleIcon, XCircleIcon, DownloadIcon, ShieldCheckIcon } from "lucide-react";
 import type { Id } from "@/convex/_generated/dataModel";
+import { sha256Hex } from "@/lib/hash";
 
 export default function SignatureDetail() {
   const { id } = useParams<{ id: string }>();
@@ -28,6 +29,13 @@ export default function SignatureDetail() {
   const [declineOpen, setDeclineOpen] = useState(false);
   const [declineReason, setDeclineReason] = useState("");
   const [busy, setBusy] = useState(false);
+  const [verifyResult, setVerifyResult] = useState<{
+    contentOk: boolean;
+    signatureOk: boolean;
+    computedContentHash: string;
+    computedSignatureHash: string;
+  } | null>(null);
+  const [verifying, setVerifying] = useState(false);
 
   if (data === undefined) return <Skeleton className="h-64" />;
   if (data === null) return <p className="text-muted-foreground">Not found.</p>;
@@ -47,6 +55,32 @@ export default function SignatureDetail() {
     try { await decline({ id: docId, reason: declineReason || undefined }); toast.success("Declined."); setDeclineOpen(false); }
     catch (e:unknown) { toast.error((e as {data?:{message?:string}}).data?.message ?? "Failed."); }
     finally { setBusy(false); }
+  };
+
+  // Recompute both hashes in the browser and compare against what the
+  // server stored at signing time. This is the "tamper-evidence" promise
+  // made in the design doc — anyone can run it, no server call required.
+  const verify = async () => {
+    if (!data) return;
+    setVerifying(true);
+    try {
+      const computedContentHash = await sha256Hex(data.content);
+      let computedSignatureHash = "";
+      if (data.status === "signed" && data.signedAt && data.signatureText) {
+        computedSignatureHash = await sha256Hex(
+          `${data.contentHash}|${data.signatureText}|${data.targetUserId}|${data.signedAt}`,
+        );
+      }
+      setVerifyResult({
+        contentOk: computedContentHash === data.contentHash,
+        signatureOk:
+          data.status === "signed" ? computedSignatureHash === data.signatureHash : true,
+        computedContentHash,
+        computedSignatureHash,
+      });
+    } finally {
+      setVerifying(false);
+    }
   };
 
   const downloadTxt = () => {
@@ -119,7 +153,59 @@ export default function SignatureDetail() {
         </Card>
       )}
 
+      {verifyResult && (
+        <Card className={
+          verifyResult.contentOk && verifyResult.signatureOk
+            ? "border-primary/40"
+            : "border-destructive/40 bg-destructive/5"
+        }>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base flex items-center gap-2">
+              {verifyResult.contentOk && verifyResult.signatureOk ? (
+                <>
+                  <ShieldCheckIcon className="w-4 h-4 text-primary" />
+                  Integrity verified
+                </>
+              ) : (
+                <>
+                  <XCircleIcon className="w-4 h-4 text-destructive" />
+                  Tampering detected
+                </>
+              )}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="text-xs space-y-1">
+            <p>
+              Content hash:{" "}
+              {verifyResult.contentOk
+                ? <span className="text-primary">matches</span>
+                : <span className="text-destructive">changed since signing</span>}
+            </p>
+            {data.status === "signed" && (
+              <p>
+                Signature hash:{" "}
+                {verifyResult.signatureOk
+                  ? <span className="text-primary">matches</span>
+                  : <span className="text-destructive">does not match</span>}
+              </p>
+            )}
+            <p className="text-muted-foreground break-all">
+              Recomputed content: {verifyResult.computedContentHash}
+            </p>
+            {data.status === "signed" && (
+              <p className="text-muted-foreground break-all">
+                Recomputed signature: {verifyResult.computedSignatureHash}
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
       <div className="flex flex-wrap gap-2">
+        <Button variant="secondary" onClick={verify} disabled={verifying}>
+          <ShieldCheckIcon className="w-4 h-4 mr-2" />
+          {verifying ? "Verifying…" : "Verify integrity"}
+        </Button>
         <Button variant="secondary" onClick={downloadTxt}>
           <DownloadIcon className="w-4 h-4 mr-2" /> Download .txt
         </Button>

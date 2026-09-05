@@ -44,6 +44,22 @@ export const schedule = mutation({
       notes: args.notes,
       status: "scheduled",
     });
+
+    // Interviews live between Screening and Offer. If the application is
+    // still upstream of that (applied/screening/shortlisted), advance it
+    // to "interview" now. Never move it backward — a hire that then gets
+    // a follow-up interview stays "hired".
+    const upstream = ["applied", "screening", "shortlisted"] as const;
+    if ((upstream as readonly string[]).includes(application.status)) {
+      await ctx.db.patch(args.applicationId, { status: "interview" });
+      await notify(ctx, {
+        userId: application.candidateId,
+        kind: "application_status",
+        title: `Your application for ${job.title} is now: interview`,
+        link: "/candidate/applications",
+      });
+    }
+
     await notify(ctx, {
       userId: application.candidateId,
       kind: "interview",

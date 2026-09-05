@@ -4,6 +4,35 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 import type { Id, Doc } from "./_generated/dataModel";
 import { notify } from "./notifications";
 
+/**
+ * Shared helper — for a set of candidate ids, returns each one's set of
+ * distinct skills they've passed at least one published assessment for.
+ * Called by employer.getApplicantsByJob and employer.searchTalentPool so
+ * verified skills show as green badges without an extra client round-trip.
+ */
+export async function passedSkillsByUser(
+  ctx: QueryCtx,
+  candidateIds: Id<"users">[],
+): Promise<Map<string, string[]>> {
+  const out = new Map<string, string[]>();
+  await Promise.all(
+    candidateIds.map(async (uid) => {
+      const attempts = await ctx.db
+        .query("assessmentAttempts")
+        .withIndex("by_candidate", (q) => q.eq("candidateId", uid))
+        .collect();
+      const passed = attempts.filter((a) => a.passed);
+      const skills = new Set<string>();
+      for (const a of passed) {
+        const asm = await ctx.db.get(a.assessmentId);
+        if (asm?.skill) skills.add(asm.skill);
+      }
+      out.set(uid, [...skills]);
+    })
+  );
+  return out;
+}
+
 async function requireOwner(ctx: MutationCtx | QueryCtx, assessmentId: Id<"assessments">) {
   const userId = await getAuthUserId(ctx);
   if (!userId) throw new ConvexError({ message: "Not authenticated", code: "UNAUTHENTICATED" });
@@ -282,6 +311,16 @@ export const submitAttempt = mutation({
       title: `${taker?.name ?? "A candidate"} ${passed ? "passed" : "attempted"} "${a.title}"`,
       body: `Score ${score}% (pass ≥ ${a.passingScore}%)`,
       link: `/employer/assessments/${a._id}`,
+    });
+    // Also notify the candidate themselves — passing earns a verified badge
+    // on their profile, so surface it in their inbox.
+    await notify(ctx, {
+      userId,
+      kind: "assessment",
+      title: passed
+        ? `You passed "${a.title}" — verified ${a.skill} badge earned`
+        : `Assessment "${a.title}" scored ${score}% (pass ≥ ${a.passingScore}%)`,
+      link: "/candidate/assessments",
     });
     return { score, passed };
   },

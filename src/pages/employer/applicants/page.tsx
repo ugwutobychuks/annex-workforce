@@ -8,12 +8,13 @@ import { Badge } from "@/components/ui/badge.tsx";
 import { Skeleton } from "@/components/ui/skeleton.tsx";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select.tsx";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog.tsx";
-import { UserIcon, BriefcaseIcon, MessageSquareIcon, CalendarIcon, StarIcon } from "lucide-react";
+import { UserIcon, BriefcaseIcon, MessageSquareIcon, CalendarIcon, StarIcon, FileTextIcon } from "lucide-react";
 import type { Id } from "@/convex/_generated/dataModel.d.ts";
 import { cn } from "@/lib/utils.ts";
 import { useNavigate } from "react-router-dom";
 import { ScheduleInterviewDialog } from "@/components/schedule-interview-dialog.tsx";
 import { RateHireDialog } from "@/components/rate-hire-dialog.tsx";
+import { ContractFromHireDialog } from "@/components/contract-from-hire-dialog.tsx";
 
 const PIPELINE_STAGES = [
   { key: "applied",     label: "Applied",     color: "bg-blue-500" },
@@ -34,6 +35,7 @@ type Applicant = {
   _creationTime: number;
   candidate: { _id: Id<"users">; name?: string; email?: string } | null;
   profile: { headline?: string; skills: string[]; isVerified?: boolean } | null;
+  passedSkills: string[];
 };
 
 function ApplicantCard({
@@ -61,9 +63,19 @@ function ApplicantCard({
       </div>
       {app.profile?.skills && app.profile.skills.length > 0 && (
         <div className="flex flex-wrap gap-1">
-          {app.profile.skills.slice(0, 3).map((s) => (
-            <Badge key={s} variant="secondary" className="text-xs">{s}</Badge>
-          ))}
+          {app.profile.skills.slice(0, 3).map((s) => {
+            const verified = app.passedSkills.some((ps) => ps.toLowerCase() === s.toLowerCase());
+            return (
+              <Badge
+                key={s}
+                variant={verified ? "default" : "secondary"}
+                className="text-xs"
+                title={verified ? "Passed an assessment for this skill" : undefined}
+              >
+                {verified ? "✓ " : ""}{s}
+              </Badge>
+            );
+          })}
           {app.profile.skills.length > 3 && (
             <Badge variant="secondary" className="text-xs">+{app.profile.skills.length - 3}</Badge>
           )}
@@ -147,6 +159,7 @@ export default function ApplicantsPage() {
 
   const [scheduleForApp, setScheduleForApp] = useState<Id<"applications"> | null>(null);
   const [rateFor, setRateFor] = useState<Id<"applications"> | null>(null);
+  const [contractForApp, setContractForApp] = useState<Applicant | null>(null);
 
   const messageCandidate = async (applicationId: Id<"applications">) => {
     try {
@@ -298,9 +311,14 @@ export default function ApplicantsPage() {
                 </p>
                 <div className="flex gap-2 flex-wrap">
                   {selectedApp.status === "hired" && (
-                    <Button size="sm" variant="secondary" onClick={() => setRateFor(selectedApp._id)}>
-                      <StarIcon className="w-3.5 h-3.5 mr-1" /> Rate candidate
-                    </Button>
+                    <>
+                      <Button size="sm" onClick={() => setContractForApp(selectedApp)}>
+                        <FileTextIcon className="w-3.5 h-3.5 mr-1" /> Create EOR contract
+                      </Button>
+                      <Button size="sm" variant="secondary" onClick={() => setRateFor(selectedApp._id)}>
+                        <StarIcon className="w-3.5 h-3.5 mr-1" /> Rate candidate
+                      </Button>
+                    </>
                   )}
                   <Button
                     size="sm"
@@ -332,6 +350,18 @@ export default function ApplicantsPage() {
       )}
       {rateFor && (
         <RateHireDialog applicationId={rateFor} open={!!rateFor} onClose={() => setRateFor(null)} />
+      )}
+      {contractForApp && contractForApp.candidate && (
+        <ContractFromHireDialog
+          applicationId={contractForApp._id}
+          candidateId={contractForApp.candidate._id}
+          candidateName={contractForApp.candidate.name ?? "the candidate"}
+          jobTitle={selectedJobId
+            ? (jobs.find((j) => j._id === selectedJobId)?.title ?? "Role")
+            : "Role"}
+          open={!!contractForApp}
+          onClose={() => setContractForApp(null)}
+        />
       )}
     </div>
   );

@@ -3,6 +3,7 @@ import { mutation, query, type MutationCtx, type QueryCtx } from "./_generated/s
 import { paginationOptsValidator } from "convex/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { notify } from "./notifications";
+import { passedSkillsByUser } from "./assessments";
 
 async function getCurrentUser(ctx: QueryCtx | MutationCtx) {
   const userId = await getAuthUserId(ctx);
@@ -140,6 +141,11 @@ export const getApplicantsByJob = query({
       .withIndex("by_job", (q) => q.eq("jobId", args.jobId))
       .collect();
 
+    const passedMap = await passedSkillsByUser(
+      ctx,
+      applications.map((a) => a.candidateId)
+    );
+
     return await Promise.all(
       applications.map(async (app) => {
         const candidate = await ctx.db.get(app.candidateId);
@@ -149,7 +155,12 @@ export const getApplicantsByJob = query({
               .withIndex("by_user", (q) => q.eq("userId", candidate._id))
               .unique()
           : null;
-        return { ...app, candidate, profile };
+        return {
+          ...app,
+          candidate,
+          profile,
+          passedSkills: passedMap.get(app.candidateId) ?? [],
+        };
       })
     );
   },
@@ -202,13 +213,17 @@ export const searchTalentPool = query({
       .withIndex("by_role", (q) => q.eq("role", "candidate"))
       .take(200);
 
+    const passedMap = await passedSkillsByUser(
+      ctx,
+      candidateUsers.map((u) => u._id)
+    );
     const results = await Promise.all(
       candidateUsers.map(async (u) => {
         const profile = await ctx.db
           .query("candidateProfiles")
           .withIndex("by_user", (q) => q.eq("userId", u._id))
           .unique();
-        return { user: u, profile };
+        return { user: u, profile, passedSkills: passedMap.get(u._id) ?? [] };
       })
     );
 
